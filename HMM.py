@@ -107,6 +107,24 @@ class HiddenMarkovModel:
         probs = [[0. for _ in range(self.L)] for _ in range(M + 1)]
         seqs = [['' for _ in range(self.L)] for _ in range(M + 1)]
 
+        # prob[0] is the start state, let the entried remain zero
+        # Initialize probs[1] and seqs[1] first
+        for index in range(self.L):
+            probs[1][index] = self.A_start[index]*self.O[index][x[0]]
+            seqs[1][index] = str(index)
+
+        for sequence_index in range(M):
+            if sequence_index > 0:
+               for state_index in range(self.L):
+                   max_prob_temp = 0
+                   max_index = 0
+                   for last_sequence_state_index in range(self.L):
+                       prob_temp = probs[sequence_index][last_sequence_state_index]*self.A[last_sequence_state_index][state_index]*self.O[state_index][x[sequence_index]]
+                       if max_prob_temp < prob_temp:
+                          max_prob_temp = prob_temp
+                          max_index = last_sequence_state_index
+                   probs[sequence_index+1][state_index] = max_prob_temp
+                   seqs[sequence_index+1][state_index] = seqs[sequence_index][max_index]+str(state_index)
         ###
         ###
         ### 
@@ -114,8 +132,11 @@ class HiddenMarkovModel:
         ###
         ###
         ###
-
-        max_seq = ''
+        prob_temp = 0
+        for index in range(self.L):
+            if prob_temp < probs[M][index]:
+               prob_temp = probs[M][index]
+               max_seq = seqs[M][index]
         return max_seq
 
 
@@ -146,7 +167,29 @@ class HiddenMarkovModel:
 
         M = len(x)      # Length of sequence.
         alphas = [[0. for _ in range(self.L)] for _ in range(M + 1)]
+        # Intialize alpha[1] since its dependence on alpha[0] is special
+        start_sum = 0
+        for state_index in range(self.L):
+            alphas[1][state_index] = self.O[state_index][x[0]]*1*self.A_start[state_index]
+            start_sum += self.O[state_index][x[0]]*1*self.A_start[state_index]
+        if normalize:
+           for index in range(self.L):
+               alphas[1][index] /= start_sum
 
+        # compute from sequence with 2 words to those of M words
+        for sequence_index in range(M):
+            if sequence_index > 0:
+               sequence_sum = 0 # in case of normalization
+               for state_index in range(self.L): # loop through each possible state
+                   alpha_last_sum = 0 # initialize the alpha_sum from previous sequence
+                   for last_sequence_state_index in range(self.L):
+                       alpha_last_sum += alphas[sequence_index][last_sequence_state_index]*self.A[last_sequence_state_index][state_index]
+                   alphas[sequence_index+1][state_index] = self.O[state_index][x[sequence_index]]*alpha_last_sum
+                   sequence_sum += self.O[state_index][x[sequence_index]]*alpha_last_sum
+                # apply normalization if normalize == true after computation ends for each index
+               if normalize:
+                  for index in range(self.L):
+                      alphas[sequence_index+1][index] /= sequence_sum        
         ###
         ###
         ### 
@@ -185,6 +228,27 @@ class HiddenMarkovModel:
 
         M = len(x)      # Length of sequence.
         betas = [[0. for _ in range(self.L)] for _ in range(M + 1)]
+        # Initialize betas[M]
+        for index in range(self.L):
+            betas[M][index] = 1
+        if normalize:
+           for index in range(self.L):
+               betas[M][index] = 1./self.L
+        # loop starts from M-1
+        for index in range(M):
+            if index > 0:
+               sequence_index = M-index
+               sequence_sum = 0
+               for state_index in range(self.L):
+                   for next_state_index in range(self.L):
+                       betas[sequence_index][state_index] += betas[sequence_index+1][next_state_index]*self.A[state_index][next_state_index]*self.O[next_state_index][x[sequence_index]]
+                   sequence_sum += betas[sequence_index][state_index]
+               if normalize:
+                  for index in range(self.L):
+                      betas[sequence_index][index] /= sequence_sum
+
+
+
 
         ###
         ###
@@ -219,6 +283,18 @@ class HiddenMarkovModel:
         '''
 
         # Calculate each element of A using the M-step formulas.
+        for current_state in range(self.L):
+            for next_state in range(self.L):
+                numerator = 0
+                denominator = 0
+                for index in range(len(Y)):
+                    for list_index in range(len(Y[index])-1):
+                        if (Y[index][list_index] == current_state):
+                            denominator += 1
+                            if (Y[index][list_index+1] == next_state):
+                               numerator += 1
+
+                self.A[current_state][next_state] = numerator/denominator
 
         ###
         ###
@@ -229,7 +305,17 @@ class HiddenMarkovModel:
         ###
 
         # Calculate each element of O using the M-step formulas.
-
+        for state_index in range(self.L):
+            for emission_state in range(self.D):
+                numerator = 0
+                denominator = 0
+                for index in range(len(Y)):
+                    for list_index in range(len(Y[index])):
+                        if (Y[index][list_index] == state_index):
+                            denominator += 1
+                            if (X[index][list_index] == emission_state):
+                                numerator += 1
+                self.O[state_index][emission_state] = numerator/denominator
         ###
         ###
         ### 
@@ -254,7 +340,76 @@ class HiddenMarkovModel:
 
             N_iters:    The number of iterations to train on.
         '''
+        normalize = True
+        for iteration in range(N_iters):
 
+            P_y_xall = []
+            P_ylast_ycurrent_xall = []
+
+            for input_index in range(len(X)):
+                xi = X[input_index]
+                Mi = len(xi)
+                alphas = self.forward(xi,normalize)
+                betas = self.backward(xi,normalize)
+                P_currentstate_xi = [[0. for _ in range(self.L)] for _ in range(Mi)]
+                P_laststate_currentstate_xi = []
+                denominator1 = [0. for _ in range(Mi)]
+                denominator2 = [0. for _ in range(Mi-1)]
+
+                # compute P(y^j=a,xi) and P(y^j=a,y^j+1=b,xi)
+                for sequence_index in range(Mi):
+                    for state_index in range(self.L):
+                        denominator1[sequence_index] += alphas[sequence_index+1][state_index] * betas[sequence_index+1][state_index]
+                
+                for sequence_index in range(Mi):
+                    for state_index in range(self.L):
+                        P_currentstate_xi[sequence_index][state_index] = alphas[sequence_index+1][state_index]*betas[sequence_index+1][state_index]/denominator1[sequence_index]
+
+
+                for sequence_index in range(Mi-1):
+                    for state_index_a in range(self.L):
+                        for state_index_b in range(self.L):
+                            denominator2[sequence_index] += alphas[sequence_index+1][state_index_a]*betas[sequence_index+2][state_index_b]*\
+                            self.O[state_index_b][xi[sequence_index+1]]*self.A[state_index_a][state_index_b]
+
+                for sequence_index in range(Mi-1):
+                    P_laststate_currentstate_xi.append([[0. for _ in range(self.L)] for _ in range(self.L)])
+                    for last_state in range(self.L):
+                        for current_state in range(self.L):
+                            P_laststate_currentstate_xi[sequence_index][last_state][current_state] = alphas[sequence_index+1][last_state]*\
+                            betas[sequence_index+2][current_state]*self.A[last_state][current_state]*self.O[current_state][xi[sequence_index+1]]/denominator2[sequence_index]
+
+                P_y_xall.append(P_currentstate_xi)
+                P_ylast_ycurrent_xall.append(P_laststate_currentstate_xi)
+
+            # now start to update A and O
+            for last_state_index in range(self.L):
+                for current_state_index in range(self.L):
+
+                    numerator = 0
+                    denominator = 0
+                    for index in range(len(X)):
+                        Mi = len(X[index])
+                        for sequence_index in range(Mi-1):
+                            numerator +=  P_ylast_ycurrent_xall[index][sequence_index][last_state_index][current_state_index]
+                            denominator += P_y_xall[index][sequence_index][last_state_index]
+                    self.A[last_state_index][current_state_index] = numerator/denominator
+
+            for state_index in range(self.L):
+                for emission_index in range(self.D):
+
+                    numerator = 0
+                    denominator = 0
+                    for index in range(len(X)):
+                        Mi = len(X[index])
+                        for sequence_index in range(Mi):
+                            if (X[index][sequence_index] == emission_index):
+                               numerator += P_y_xall[index][sequence_index][state_index]
+                            denominator += P_y_xall[index][sequence_index][state_index]
+                    self.O[state_index][emission_index] = numerator/denominator
+
+        # checked for indexing: states: happy-0, mellow-1, sad-2, angry-3
+        # genres: rock-0, pop-1, house-2, metal-3, folk-4, blues-5, dubstep-6, jazz-7, rap-8, classical-9
         ###
         ###
         ### 
@@ -282,6 +437,51 @@ class HiddenMarkovModel:
 
         emission = []
         states = []
+
+        states_index = range(self.L)
+        emission_index = range(self.D)
+
+        states.append(random.choices(states_index, self.A_start)[0])
+        emission.append(random.choices(emission_index, self.O[states[0]])[0])
+        #states.append(np.random.choice(self.L, 1, p = self.A_start)[0])
+        #emission.append(np.random.choice(self.D, 1, p = self.O[states[0]])[0])
+        '''
+        max_index = 0
+        prob = 0
+        for emission_index in range(self.D):
+            if prob < self.O[states[0]][emission_index]:
+               prob = self.O[states[0]][emission_index]
+               max_index = emission_index
+
+        emission.append(max_index)
+        '''
+
+        for sequence_index in range(M):
+            if sequence_index > 0:
+                '''
+                max_index = 0
+                prob = 0
+                for state_index in range(self.L):
+                    if prob < self.A[states[sequence_index-1]][state_index]:
+                       prob = self.A[states[sequence_index-1]][state_index]
+                       max_index = state_index
+                states.append(max_index)
+
+                prob = 0
+                max_index = 0
+                for emission_index in range(self.D):
+                    if prob < self.O[states[sequence_index]][emission_index]:
+                       prob = self.O[states[sequence_index]][emission_index]
+                       max_index = emission_index
+                emission.append(max_index)
+                '''
+                states.append(random.choices(states_index,self.A[states[sequence_index-1]])[0])
+                emission.append(random.choices(emission_index, self.O[states[sequence_index]])[0])
+                #emission.append(3)
+                #states.append(np.random.choice(self.L, 1, p = self.A[states[sequence_index-1]])[0])
+                #emission.append(np.random.choice(self.D, 1, p = self.O[states[sequence_index]])[0])
+
+
 
         ###
         ###
@@ -397,7 +597,7 @@ def supervised_HMM(X, Y):
 
     return HMM
 
-def unsupervised_HMM(X, n_states, N_iters):
+def unsupervised_HMM(X, n_states, N_iters, seedn):
     '''
     Helper function to train an unsupervised HMM. The function determines the
     number of unique observations in the given data, initializes
@@ -422,6 +622,8 @@ def unsupervised_HMM(X, n_states, N_iters):
     # Compute L and D.
     L = n_states
     D = len(observations)
+
+    random.seed(seedn)
 
     # Randomly initialize and normalize matrix A.
     A = [[random.random() for i in range(L)] for j in range(L)]
