@@ -1,4 +1,3 @@
-
 import os
 import re
 import numpy as np
@@ -35,7 +34,7 @@ def get_syllabus(line, idx, syll_map):
                 syll = syll_map[word][1]
     return syll        
 
-
+    
 def get_poem_sequence(filename, option):
     '''
     option: poem, line, stanza1, stanza2, stanza3, stanza4
@@ -48,8 +47,10 @@ def get_poem_sequence(filename, option):
 
     obs_counter = 0
     obs = []
+    obs_Y = []
     obs_map = {}
     obs_elem = []
+    obs_Y_elem = []
     
     # read syllables map
     syll_map = {}
@@ -65,7 +66,41 @@ def get_poem_sequence(filename, option):
             sylls.append(line[idx])
         syll_map[word] = sylls
         
-
+    # read state map
+    state_map = {}
+    text_state = open(os.path.join(os.getcwd(), 'data/cmudict.dict')).read()
+    lines_state = [line.split() for line in text_state.split('\n') if line.split()]
+    
+    debug_line = 0
+    for line in lines_state:
+        word = line[0]
+        word = re.sub(r'[^\w]', '', word).lower()
+        #print(word)
+        sylls_all = ['0', '1', '01', '10', '001', '010', '100', '0001', '0010', 
+                     '0100', '1000', '00001', '00010', '00100', '01000', '10000']
+        #0, 1,  2,  3,   4,   5,   6,    7,    8,    9,   10,    11,    12,    13,    14,    15, 16 (NA),  17(punction)
+        sylls = ''
+        for idx in range(1, len(line)):
+            if line[idx][-1] == '1':
+                sylls = sylls+'1'
+            if line[idx][-1] == '0' or line[idx][-1] == '2':
+                sylls = sylls+'0'
+            #if debug_line == 0:
+                #print(sylls)
+                #print(len(line))
+                #print(line[idx][-1])
+                #print('...')
+        
+        state = 16
+        
+        for idx in range(len(sylls_all)):
+            if sylls == sylls_all[idx]:
+                state = idx
+        state_map[word] = state
+        #print(state)
+        debug_line += 1
+    
+    print(state_map['from'])
     for idx in range(len(lines)):
         line = lines[idx]
         # ignore poem number
@@ -76,10 +111,16 @@ def get_poem_sequence(filename, option):
             for word in line:
                 if (word == ',') or (word == '.') or (word == '?') or (word == '!') or (word == ';') or (word == ':'):
                     word = word+'_0'
+                    obs_Y_elem.append(17)
                 else:
                     word = re.sub(r'[^\w]', '', word).lower()
                     if word == '':
                         continue
+                    
+                    if word in state_map:
+                        obs_Y_elem.append(state_map[word])
+                    else:
+                        obs_Y_elem.append(16)
                     ####add syllables as suffix of the word####
                     word = word+'_'+get_syllabus(line, word_index_in_line, syll_map)
                     ########
@@ -93,41 +134,57 @@ def get_poem_sequence(filename, option):
 
         if option == 'line':
             obs.append(obs_elem)
+            obs_Y.append(obs_Y_elem)
             obs_elem = []
+            obs_Y_elem = []
 
         if option == 'poem':
             if idx % 15 == 14:
                 # Add the encoded sequence.
                 obs.append(obs_elem)
+                obs_Y.append(obs_Y_elem)
                 # initialzie the sequence
                 obs_elem = []
+                obs_Y_elem = []
 
         if option == 'stanza1':
             if idx % 15 == 4:
                 obs.append(obs_elem)
+                obs_Y.append(obs_Y_elem)
                 obs_elem = []
+                obs_Y_elem = []
             if idx % 15 == 14:
                 obs_elem = []
+                obs_Y_elem = []
 
         if option == 'stanza2':
             if idx % 15 == 8:
                 obs.append(obs_elem)
+                obs_Y.append(obs_Y_elem)
                 obs_elem = []
+                obs_Y_elem = []
             if idx % 15 == 4:
                 obs_elem = []
+                obs_Y_elem = []
 
         if option == 'stanza3':
             if idx % 15 == 12:
                 obs.append(obs_elem)
+                obs_Y.append(obs_Y_elem)
                 obs_elem = []
+                obs_Y_elem = []
             if idx % 15 == 8:
                 obs_elem = []
+                obs_Y_elem = []
 
         if option == 'stanza4':
             if idx % 15 == 14:
                 obs.append(obs_elem)
+                obs_Y.append(obs_Y_elem)
                 obs_elem = []
+                obs_Y_elem = []
             if idx % 15 == 12:
                 obs_elem = []
+                obs_Y_elem = []
 
-    return obs, obs_map
+    return obs, obs_Y, obs_map
