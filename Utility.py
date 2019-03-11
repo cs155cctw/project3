@@ -30,9 +30,8 @@ def get_syllabus(line, idx, syll_map):
                     continue
                 if len(syll_map[word2]) == 1:
                     sum_syll += int(syll_map[word][0])
-            if sum_syll+int(syll_map[word][0]) == 10:
-                syll = syll_map[word][0]
-            if sum_syll+int(syll_map[word][0]) == 10:
+            syll = syll_map[word][0]
+            if sum_syll+int(syll_map[word][1]) == 10:
                 syll = syll_map[word][1]
     return syll        
 
