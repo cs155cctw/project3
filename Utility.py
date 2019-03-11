@@ -75,23 +75,17 @@ def get_poem_sequence(filename, option):
     for line in lines_state:
         word = line[0]
         word = re.sub(r'[^\w]', '', word).lower()
-        #print(word)
-        sylls_all = ['0', '1', '01', '10', '001', '010', '100', '0001', '0010', 
-                     '0100', '1000', '00001', '00010', '00100', '01000', '10000']
-        #0, 1,  2,  3,   4,   5,   6,    7,    8,    9,   10,    11,    12,    13,    14,    15, 16 (NA),  17(punction)
+        sylls_all = ['0', '1', '01', '10', '001', '010', '100', '0010', 
+                     '0100', '1000']
+        #0, 1,  2,  3,   4,   5,   6,    7,    8,    9,   10(NA),  11(punction)
         sylls = ''
         for idx in range(1, len(line)):
             if line[idx][-1] == '1':
                 sylls = sylls+'1'
             if line[idx][-1] == '0' or line[idx][-1] == '2':
                 sylls = sylls+'0'
-            #if debug_line == 0:
-                #print(sylls)
-                #print(len(line))
-                #print(line[idx][-1])
-                #print('...')
         
-        state = 16
+        state = 10
         
         for idx in range(len(sylls_all)):
             if sylls == sylls_all[idx]:
@@ -111,7 +105,7 @@ def get_poem_sequence(filename, option):
             for word in line:
                 if (word == ',') or (word == '.') or (word == '?') or (word == '!') or (word == ';') or (word == ':'):
                     word = word+'_0'
-                    obs_Y_elem.append(17)
+                    obs_Y_elem.append(11)
                 else:
                     word = re.sub(r'[^\w]', '', word).lower()
                     if word == '':
@@ -120,7 +114,7 @@ def get_poem_sequence(filename, option):
                     if word in state_map:
                         obs_Y_elem.append(state_map[word])
                     else:
-                        obs_Y_elem.append(16)
+                        obs_Y_elem.append(10)
                     ####add syllables as suffix of the word####
                     word = word+'_'+get_syllabus(line, word_index_in_line, syll_map)
                     ########
