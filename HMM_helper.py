@@ -117,7 +117,33 @@ def obs_map_reverser(obs_map):
 
     return obs_map_r
 
-def sample_sentence(hmm, obs_map, n_words=100):
+def sample_sentence(hmm, obs_map, n_syllable = 10):
+    # Get reverse map.
+    obs_map_r = obs_map_reverser(obs_map)
+
+    # Sample and convert sentence.
+    emission, states = hmm.generate_emission(n_syllable)
+    sentence = [obs_map_r[i] for i in emission]
+
+    return ' '.join(sentence).capitalize()
+
+
+def sample_stanza(hmm, obs_map, n_stanza = 4):
+    # Get reverse map.
+    obs_map_r = obs_map_reverser(obs_map)
+
+    # Sample and convert sentence.
+    if n_stanza = 4:
+        stanza[0] = sample_sentence(hmm,obs_map)
+        stanza[1] = sample_sentence(hmm,obs_map)
+        
+
+
+    return ' '.join(stanza).capitalize() + '...'
+
+
+
+def sample_poem(hmm, obs_map):
     # Get reverse map.
     obs_map_r = obs_map_reverser(obs_map)
 
@@ -126,6 +152,8 @@ def sample_sentence(hmm, obs_map, n_words=100):
     sentence = [obs_map_r[i] for i in emission]
 
     return ' '.join(sentence).capitalize() + '...'
+
+
 
 
 ####################
