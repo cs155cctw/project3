@@ -342,7 +342,8 @@ class HiddenMarkovModel:
         '''
         normalize = True
         for iteration in range(N_iters):
-
+            if iteration%10 == 0:
+                print('iteration '+str(iteration))
             P_y_xall = []
             P_ylast_ycurrent_xall = []
 
