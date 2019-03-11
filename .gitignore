@@ -1,0 +1,6 @@
+*.o
+*.aux
+*.out
+*.log
+*.pyc
+__pycache__
