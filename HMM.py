@@ -422,7 +422,7 @@ class HiddenMarkovModel:
         pass
 
 
-    def generate_emission(self, M):
+    def generate_emission(self,obs_map_r, M=10):
         '''
         Generates an emission of length M, assuming that the starting state
         is chosen uniformly at random. 
@@ -438,60 +438,73 @@ class HiddenMarkovModel:
 
         emission = []
         states = []
+        syllable_num = 0.0
+        
 
         states_index = range(self.L)
-        emission_index = range(self.D)
+        emission_full_index = range(self.D)
 
+        #emission_full_index [emission_full_index == 6] = ''
+        emission_index = []
+        
+        for i in range(self.D):
+         
+            if obs_map_r[i].split('_')[1][0] != 'E':
+                emission_index.append(i)
+            
+            
+
+       
         states.append(random.choices(states_index, self.A_start)[0])
-        emission.append(random.choices(emission_index, self.O[states[0]])[0])
-        #states.append(np.random.choice(self.L, 1, p = self.A_start)[0])
-        #emission.append(np.random.choice(self.D, 1, p = self.O[states[0]])[0])
-        '''
-        max_index = 0
-        prob = 0
-        for emission_index in range(self.D):
-            if prob < self.O[states[0]][emission_index]:
-               prob = self.O[states[0]][emission_index]
-               max_index = emission_index
+        O_mat = [self.O[states[0]][i] for i in emission_index]
+        emission_rand_index = random.choices(emission_index, O_mat )[0]
+        emission.append(emission_rand_index)
+        #print(obs_map_r[emission_rand_index].split('_')[1][0])
+        syllable_num += int(obs_map_r[emission_rand_index].split('_')[1][0])
+       
+        wordnum = 1
+        
+        
+                
+        while syllable_num < M:
+            
+            print(emission)
+            print(states)
+            states.append(random.choices(states_index,self.A[states[wordnum-1]])[0])
+            emission_rand_index= random.choices(emission_full_index, self.O[states[wordnum]])[0]
 
-        emission.append(max_index)
-        '''
+            if obs_map_r[emission_rand_index].split('_')[1][0] == 'E'and int(obs_map_r[emission_rand_index].split('_')[1][1]) + syllable_num == 10:                
+                emission.append(emission_rand_index)
+                break 
+            elif obs_map_r[emission_rand_index].split('_')[1][0] != 'E' and int(obs_map_r[emission_rand_index].split('_')[1][0])+ syllable_num == 10:                 
+                emission.append(emission_rand_index)
+                break 
+            else:
+                emission_index = []
+                for i in range(self.D):
+                    
+                    if obs_map_r[i].split('_')[1][0] != 'E' and int(obs_map_r[i].split('_')[1][0]) + syllable_num <= 10:
+                        emission_index.append(i)
+                
+                O_mat = [self.O[states[wordnum]][i] for i in emission_index]
+                emission_rand_index = random.choices(emission_index, O_mat)[0]
+                   
+                
+                       
+                if syllable_num + int(obs_map_r[emission_rand_index].split('_')[1][0]) == 10:
+                    emission.append(emission_rand_index)
+                    break
+                
+                elif syllable_num + int(obs_map_r[emission_rand_index].split('_')[1][0]) < 10:
+                    emission.append(emission_rand_index)
+                    syllable_num += int(obs_map_r[emission_rand_index].split('_')[1][0])
+                    wordnum += 1
+                    continue 
+       
+ 
+            
 
-        for sequence_index in range(M):
-            if sequence_index > 0:
-                '''
-                max_index = 0
-                prob = 0
-                for state_index in range(self.L):
-                    if prob < self.A[states[sequence_index-1]][state_index]:
-                       prob = self.A[states[sequence_index-1]][state_index]
-                       max_index = state_index
-                states.append(max_index)
-
-                prob = 0
-                max_index = 0
-                for emission_index in range(self.D):
-                    if prob < self.O[states[sequence_index]][emission_index]:
-                       prob = self.O[states[sequence_index]][emission_index]
-                       max_index = emission_index
-                emission.append(max_index)
-                '''
-                states.append(random.choices(states_index,self.A[states[sequence_index-1]])[0])
-                emission.append(random.choices(emission_index, self.O[states[sequence_index]])[0])
-                #emission.append(3)
-                #states.append(np.random.choice(self.L, 1, p = self.A[states[sequence_index-1]])[0])
-                #emission.append(np.random.choice(self.D, 1, p = self.O[states[sequence_index]])[0])
-
-
-
-        ###
-        ###
-        ### 
-        ### TODO: Insert Your Code Here (2F)
-        ###
-        ###
-        ###
-
+        print(syllable_num)
         return emission, states
 
 

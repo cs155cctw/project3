@@ -122,24 +122,21 @@ def sample_sentence(hmm, obs_map, n_syllable = 10):
     obs_map_r = obs_map_reverser(obs_map)
 
     # Sample and convert sentence.
-    emission, states = hmm.generate_emission(n_syllable)
-    sentence = [obs_map_r[i] for i in emission]
-
+    emission, states = hmm.generate_emission(obs_map_r, n_syllable)
+    sentence = [obs_map_r[i].split('_')[0] for i in emission]
+#
     return ' '.join(sentence).capitalize()
 
 
 def sample_stanza(hmm, obs_map, n_stanza = 4):
     # Get reverse map.
-    obs_map_r = obs_map_reverser(obs_map)
-
+    stanza = [[],[],[],[]]
     # Sample and convert sentence.
-    if n_stanza = 4:
+    if n_stanza == 4:
         stanza[0] = sample_sentence(hmm,obs_map)
         stanza[1] = sample_sentence(hmm,obs_map)
         
-
-
-    return ' '.join(stanza).capitalize() + '...'
+        return ' '.join(stanza[0]).capitalize() + ',' + '\n' + ' '.join(stanza[1]).capitalize() +'.'
 
 
 
