@@ -72,21 +72,22 @@ def get_poem_sequence(filename, option):
         # ignore poem number
         if idx % 15 < 1:
             continue
-        word_index_in_line = 0
-        for word in line:
-            word = re.sub(r'[^\w]', '', word).lower()
-            if word == '':
-                continue
-            ####add syllables as suffix of the word####
-            word = word+'_'+get_syllabus(line, word_index_in_line, syll_map)
-            ########
-            if word not in obs_map:
-                # Add unique words to the observations map.
-                obs_map[word] = obs_counter
-                obs_counter += 1
-            # Add the encoded word.
-            obs_elem.append(obs_map[word])
-            word_index_in_line += 1
+        if (option == 'line') or (option == 'poem') or (option == 'stanza1' and (idx % 15 >= 1 and idx % 15 < 5 )) or (option == 'stanza2' and (idx % 15 >= 5 and idx % 15 < 9 )) or (option == 'stanza3' and (idx % 15 >= 9 and idx % 15 < 13 )) or (option == 'stanza4' and (idx % 15 >= 13 and idx % 15 < 15 )):
+            word_index_in_line = 0
+            for word in line:
+                word = re.sub(r'[^\w]', '', word).lower()
+                if word == '':
+                    continue
+                ####add syllables as suffix of the word####
+                word = word+'_'+get_syllabus(line, word_index_in_line, syll_map)
+                ########
+                if word not in obs_map:
+                    # Add unique words to the observations map.
+                    obs_map[word] = obs_counter
+                    obs_counter += 1
+                # Add the encoded word.
+                obs_elem.append(obs_map[word])
+                word_index_in_line += 1
 
         if option == 'line':
             obs.append(obs_elem)
