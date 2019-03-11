@@ -7,6 +7,7 @@
 ########################################
 
 import re
+import random
 import numpy as np
 import matplotlib.pyplot as plt
 from wordcloud import WordCloud
@@ -59,7 +60,7 @@ def states_to_wordclouds(hmm, obs_map, max_words=50, show=True):
     wordclouds = []
 
     # Generate a large emission.
-    emission, states = hmm.generate_emission(M)
+    emission, states = hmm.generate_emission_nWords(M)
 
     # For each state, get a list of observations that have been emitted
     # from that state.
@@ -117,14 +118,99 @@ def obs_map_reverser(obs_map):
 
     return obs_map_r
 
-def sample_sentence(hmm, obs_map, n_syllable = 10):
+def sample_sentence(hmm, obs_map, print_syllable = False, n_syllable = 10):
     # Get reverse map.
     obs_map_r = obs_map_reverser(obs_map)
 
     # Sample and convert sentence.
     emission, states = hmm.generate_emission(obs_map_r, n_syllable)
-    sentence = [obs_map_r[i].split('_')[0] for i in emission]
-#
+    sentence = [obs_map_r[i] for i in emission]
+    if print_syllable == False:
+        sentence = []
+        sentence = [obs_map_r[i].split('_')[0] for i in emissions]
+    return ' '.join(sentence).capitalize()
+
+def sample_sentence_multipleModel(hmm_list, obs_map, print_syllable = False, n_syllable = 10):
+    # Get reverse map.
+    obs_map_r = obs_map_reverser(obs_map)
+
+    # Sample and convert sentence.
+    # emission, states = hmm.generate_emission(n_syllable)
+    
+    emissions = []
+    syllable_num = 0.0
+    
+    probabilities = np.zeros(hmm_list[0].D)
+    emission_index = range(hmm_list[0].D)
+    
+    states_previous = []
+    multiply_factor = np.ones(hmm_list[0].D)
+    for idx_hmm in range(len(hmm_list)):
+        states_index = range(hmm_list[idx_hmm].L)
+        state = random.choices(states_index, hmm_list[idx_hmm].A_start)[0]
+        states_previous.append(state)
+        
+        for idx_obs in range(hmm_list[idx_hmm].D):
+            probabilities[idx_obs] += hmm_list[idx_hmm].O[state][idx_obs]
+            if (idx_hmm == 0 and hmm_list[0].O[state][idx_obs] == 0.0) or (obs_map_r[idx_obs].split('_')[1][0] == 'E'):
+                multiply_factor[idx_obs] = 0.0
+    
+    sum_P = 0.0
+    for idx_obs in range(hmm_list[idx_hmm].D):
+        probabilities[idx_obs] = probabilities[idx_obs] * multiply_factor[idx_obs]
+        sum_P += probabilities[idx_obs]
+    if sum_P > 0:
+        for idx_obs in range(hmm_list[idx_hmm].D):
+            probabilities[idx_obs] = probabilities[idx_obs]/sum_P
+            
+    emission_rand_index = random.choices(emission_index, probabilities)[0]
+    while obs_map_r[emission_rand_index].split('_')[1][0] == 'E':
+        emission_rand_index = random.choices(emission_index, probabilities)[0]
+    emissions.append(emission_rand_index)
+    syllable_num += int(obs_map_r[emission_rand_index].split('_')[1][0])
+    
+    while syllable_num < n_syllable:
+        probabilities = np.zeros(hmm_list[0].D)
+        multiply_factor = np.ones(hmm_list[0].D)
+        for idx_hmm in range(len(hmm_list)):
+            states_index = range(hmm_list[idx_hmm].L)
+            state = random.choices(states_index,hmm_list[idx_hmm].A[states_previous[idx_hmm]])[0]
+            states_previous[idx_hmm] = state
+            
+            for idx_obs in range(hmm_list[idx_hmm].D):
+                probabilities[idx_obs] += hmm_list[idx_hmm].O[state][idx_obs]
+                if idx_hmm == 0 and hmm_list[0].O[state][idx_obs] == 0.0:
+                    multiply_factor[idx_obs] = 0.0
+                syllable_num_this = 0
+                if obs_map_r[idx_obs].split('_')[1][0] == 'E':
+                    syllable_num_this = int(obs_map_r[idx_obs].split('_')[1][1])
+                    if syllable_num_this + syllable_num != 10:
+                        multiply_factor[idx_obs] = 0.0
+                else:
+                    syllable_num_this = int(obs_map_r[idx_obs].split('_')[1][0])
+                    if syllable_num_this + syllable_num > 10:
+                        multiply_factor[idx_obs] = 0.0
+        sum_P = 0.0
+        for idx_obs in range(hmm_list[idx_hmm].D):
+            probabilities[idx_obs] = probabilities[idx_obs] * multiply_factor[idx_obs]
+            sum_P = sum_P + probabilities[idx_obs]
+        if sum_P > 0:
+            for idx_obs in range(hmm_list[idx_hmm].D):
+                probabilities[idx_obs] = probabilities[idx_obs]/sum_P
+        
+        emission_rand_index = random.choices(emission_index, probabilities)[0]
+        emissions.append(emission_rand_index)
+        if obs_map_r[emission_rand_index].split('_')[1][0] == 'E':
+            syllable_num = syllable_num + int(obs_map_r[emission_rand_index].split('_')[1][1])
+        else:
+            syllable_num = syllable_num + int(obs_map_r[emission_rand_index].split('_')[1][0])
+        
+    
+    sentence = [obs_map_r[i] for i in emissions]
+    if print_syllable == False:
+        sentence = []
+        sentence = [obs_map_r[i].split('_')[0] for i in emissions]
+
     return ' '.join(sentence).capitalize()
 
 
