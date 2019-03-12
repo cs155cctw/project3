@@ -197,21 +197,20 @@ def get_poem_sequence(filename, option='line',order='normal'):
 
     return obs, obs_Y, obs_map
 
-    def get_rhyme_pair(obs):
-        Pairs = []
-        increment = np.array([0,1,4,5,8,9,12])
-        number = int(len(obs)/14)
-        for index in range(number):
-            location = increment+14*index
-            for i in range(len(location)):
-                if (i < len(location)-1):
-                    x = [obs[location[i]][1],obs[location[i]+2][1]]
-                    Pairs.append(x)
-                if (i == len(location)-1):
-                    x = [obs[location[i]][1],obs[location[i]+1][1]]
-                    Pairs.append(x)
+def get_rhyme_pair(obs):
+    Pairs = []
+    increment = np.array([0,1,4,5,8,9,12])
+    number = int(len(obs)/14)
+    for index in range(number):
+        location = increment+14*index
+        for i in range(len(location)):
+            if (i < len(location)-1):
+                x = [obs[location[i]][1],obs[location[i]+2][1]]
+                Pairs.append(x)
+            if (i == len(location)-1):
+                x = [obs[location[i]][1],obs[location[i]+1][1]]
+                Pairs.append(x)
     return Pairs
-
 
 
 
