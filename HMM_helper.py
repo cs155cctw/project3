@@ -229,7 +229,7 @@ def sample_sentence_rythme(hmm, obs_map, rthyme_pair_lib, print_syllable = False
         sentence2 = []
         sentence2 = [obs_map_r[i].split('_')[0] for i in emission2]
         
-    return ' '.join(sentence1).capitalize() +',' + ' '.join(sentence2).capitalize() 
+    return ' '.join(sentence1).capitalize() , ' '.join(sentence2).capitalize() 
 
 
 
