@@ -493,20 +493,17 @@ class HiddenMarkovModel:
                 
                 O_mat = [self.O[states[wordnum]][i] for i in emission_index]
                 emission_rand_index = random.choices(emission_index, O_mat)[0]
+                emission.append(emission_rand_index)
+                syllable_num += int(obs_map_r[emission_rand_index].split('_')[1][0])
+                wordnum += 1
                    
                 
                        
-                if syllable_num + int(obs_map_r[emission_rand_index].split('_')[1][0]) == 10:
-                    emission.append(emission_rand_index)
-                    syllable_num += int(obs_map_r[emission_rand_index].split('_')[1][0])
-                    wordnum += 1
-                    break
+                #if syllable_num == 10:
+                    #break
                 
-                elif syllable_num + int(obs_map_r[emission_rand_index].split('_')[1][0]) < 10:
-                    emission.append(emission_rand_index)
-                    syllable_num += int(obs_map_r[emission_rand_index].split('_')[1][0])
-                    wordnum += 1
-                    continue 
+                #elif syllable_num < 10:
+                    #continue 
        
  
             
@@ -642,80 +639,40 @@ class HiddenMarkovModel:
         
                
         while syllable_num_1 < M:
-            
-            #print(emission)
-            #print(states)
+        
             states_1.append(random.choices(states_1_index,self.A[states_1[wordnum_1-1]])[0])
-            emission_1_rand_index= random.choices(emission_1_index, self.O[states_1[wordnum_1]])[0]
-
-            if int(obs_map_r[emission_1_rand_index].split('_')[1][0]) + syllable_num_1 == 10:                
-                emission_1.append(emission_1_rand_index)
-                syllable_num_1 += int(obs_map_r[emission_1_rand_index].split('_')[1][0])
-                wordnum_1 += 1
-                break 
-
-            else:
-                emission_1_index = []
-                for i in range(self.D):       
-                    if obs_map_r[i].split('_')[1][0] != 'E' and int(obs_map_r[i].split('_')[1][0]) + syllable_num_2 <= 10:
-                        emission_1_index.append(i)
+            
+            emission_1_index = []
+            for i in range(self.D):
+                if obs_map_r[i].split('_')[1][0] != 'E' and int(obs_map_r[i].split('_')[1][0]) + syllable_num_2 <= 10:
+                    emission_1_index.append(i)
           
-                O_mat_1 = [self.O[states_1[wordnum_1]][i] for i in emission_1_index]                                
-                emission_1_rand_index = random.choices(emission_1_index, O_mat_1)[0]
+            O_mat_1 = [self.O[states_1[wordnum_1]][i] for i in emission_1_index]
+           
+            
+            emission_1_rand_index = random.choices(emission_1_index, O_mat_1)[0]
+            emission_1.append(emission_1_rand_index)
+            syllable_num_1 += int(obs_map_r[emission_1_rand_index].split('_')[1][0])
+            wordnum_1 += 1
                    
-                if syllable_num_1 + int(obs_map_r[emission_1_rand_index].split('_')[1][0]) == 10:
-                    emission_1.append(emission_1_rand_index)
-                    syllable_num_1 += int(obs_map_r[emission_1_rand_index].split('_')[1][0])
-                    wordnum_1 += 1
-                    break
-                
-                elif syllable_num_1 + int(obs_map_r[emission_1_rand_index].split('_')[1][0]) < 10:
-                    emission_1.append(emission_1_rand_index)
-                    syllable_num_1 += int(obs_map_r[emission_1_rand_index].split('_')[1][0])
-                    wordnum_1 += 1
-                    continue 
+               
                 
         while syllable_num_2 < M:
             
-            #print(emission)
-            #print(states)
+
             states_2.append(random.choices(states_2_index,self.A[states_2[wordnum_2-1]])[0])
-            emission_2_rand_index= random.choices(emission_2_index, self.O[states_2[wordnum_2]])[0]
+           
+            emission_2_index = []
+            for i in range(self.D):
+                if obs_map_r[i].split('_')[1][0] != 'E' and int(obs_map_r[i].split('_')[1][0]) + syllable_num_2 <= 10:
+                    emission_2_index.append(i)
+                
+            O_mat_2 = [self.O[states_2[wordnum_2]][i] for i in emission_2_index]
+            emission_2_rand_index = random.choices(emission_2_index, O_mat_2)[0]
+            emission_2.append(emission_2_rand_index)
+            syllable_num_2 += int(obs_map_r[emission_2_rand_index].split('_')[1][0])
+            wordnum_2 += 1
 
-            if int(obs_map_r[emission_2_rand_index].split('_')[1][0]) + syllable_num_2 == 10:                
-                emission_2.append(emission_2_rand_index)
-                syllable_num_2 += int(obs_map_r[emission_2_rand_index].split('_')[1][0])
-                wordnum_2 += 1
-                break 
-            
-            else:
-                emission_2_index = []
-                for i in range(self.D):
-                    
-                    if obs_map_r[i].split('_')[1][0] != 'E' and int(obs_map_r[i].split('_')[1][0]) + syllable_num_2 <= 10:
-                        emission_2_index.append(i)
-                
-                O_mat_2 = [self.O[states_2[wordnum_2]][i] for i in emission_2_index]
-                emission_2_rand_index = random.choices(emission_2_index, O_mat_2)[0]
-                   
-                
-                       
-                if syllable_num_2 + int(obs_map_r[emission_2_rand_index].split('_')[1][0]) == 10:
-                    emission_2.append(emission_2_rand_index)
-                    syllable_num_2 += int(obs_map_r[emission_2_rand_index].split('_')[1][0])
-                    wordnum_2 += 1
-                    break
-                
-                elif syllable_num_2 + int(obs_map_r[emission_2_rand_index].split('_')[1][0]) < 10:
-                    emission_2.append(emission_2_rand_index)
-                    syllable_num_2 += int(obs_map_r[emission_2_rand_index].split('_')[1][0])
-                    wordnum_2 += 1
-                    continue 
-       
- 
-            
-
-        #print(syllable_num)
         emission_1.reverse()
         states_1.reverse()
         emission_2.reverse()
