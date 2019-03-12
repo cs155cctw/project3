@@ -666,8 +666,8 @@ class HiddenMarkovModel:
         emission_1.append(emission_rthyme_index_1)
         emission_2.append(emission_rthyme_index_2)
         
-        syllable_num_1 += int(obs_map_r[emission_1_rand_index].split('_')[1][-1])
-        syllable_num_2 += int(obs_map_r[emission_2_rand_index].split('_')[1][-1])
+        syllable_num_1 += int(obs_map_r[emission_rthyme_index_1].split('_')[1][-1])
+        syllable_num_2 += int(obs_map_r[emission_rthyme_index_2].split('_')[1][-1])
         
         wordnum_1 = 1
         wordnum_2 = 1
