@@ -5,6 +5,10 @@ import numpy as np
 def get_syllabus(line, idx, syll_map):
     syll = '0'
     word = re.sub(r'[^\w]', '', line[idx]).lower()
+    word_last = re.sub(r'[^\w]', '', line[-1]).lower()
+    haspunctuation = 0
+    if word_last == '':
+        haspunctuation = 1
     if word not in syll_map:
         return syll
     
@@ -12,12 +16,12 @@ def get_syllabus(line, idx, syll_map):
         syll = syll_map[word][0]
     else:
         if syll_map[word][0][0] == 'E':
-            if idx == len(line)-1:
+            if idx == len(line)-1-haspunctuation:
                 syll = syll_map[word][0]
             else:
                 syll = syll_map[word][1]
         elif syll_map[word][1][0] == 'E':
-            if idx == len(line)-1:
+            if idx == len(line)-1-haspunctuation:
                 syll = syll_map[word][1]
             else:
                 syll = syll_map[word][0]

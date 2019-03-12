@@ -468,8 +468,8 @@ class HiddenMarkovModel:
                 
         while syllable_num < M:
             
-            print(emission)
-            print(states)
+            #print(emission)
+            #print(states)
             states.append(random.choices(states_index,self.A[states[wordnum-1]])[0])
             emission_rand_index= random.choices(emission_full_index, self.O[states[wordnum]])[0]
 
@@ -504,9 +504,75 @@ class HiddenMarkovModel:
  
             
 
-        print(syllable_num)
+        #print(syllable_num)
         return emission, states
+    
+    def generate_emission_nWords(self, M):
+        '''
+        Generates an emission of length M, assuming that the starting state
+        is chosen uniformly at random. 
+        Arguments:
+            M:          Length of the emission to generate.
+        Returns:
+            emission:   The randomly generated emission as a list.
+            states:     The randomly generated states as a list.
+        '''
 
+        emission = []
+        states = []
+
+        states_index = range(self.L)
+        emission_index = range(self.D)
+
+        states.append(random.choices(states_index, self.A_start)[0])
+        emission.append(random.choices(emission_index, self.O[states[0]])[0])
+        #states.append(np.random.choice(self.L, 1, p = self.A_start)[0])
+        #emission.append(np.random.choice(self.D, 1, p = self.O[states[0]])[0])
+        '''
+        max_index = 0
+        prob = 0
+        for emission_index in range(self.D):
+            if prob < self.O[states[0]][emission_index]:
+               prob = self.O[states[0]][emission_index]
+               max_index = emission_index
+        emission.append(max_index)
+        '''
+
+        for sequence_index in range(M):
+            if sequence_index > 0:
+                '''
+                max_index = 0
+                prob = 0
+                for state_index in range(self.L):
+                    if prob < self.A[states[sequence_index-1]][state_index]:
+                       prob = self.A[states[sequence_index-1]][state_index]
+                       max_index = state_index
+                states.append(max_index)
+                prob = 0
+                max_index = 0
+                for emission_index in range(self.D):
+                    if prob < self.O[states[sequence_index]][emission_index]:
+                       prob = self.O[states[sequence_index]][emission_index]
+                       max_index = emission_index
+                emission.append(max_index)
+                '''
+                states.append(random.choices(states_index,self.A[states[sequence_index-1]])[0])
+                emission.append(random.choices(emission_index, self.O[states[sequence_index]])[0])
+                #emission.append(3)
+                #states.append(np.random.choice(self.L, 1, p = self.A[states[sequence_index-1]])[0])
+                #emission.append(np.random.choice(self.D, 1, p = self.O[states[sequence_index]])[0])
+
+
+
+        ###
+        ###
+        ### 
+        ### TODO: Insert Your Code Here (2F)
+        ###
+        ###
+        ###
+
+        return emission, states
 
     def probability_alphas(self, x):
         '''
