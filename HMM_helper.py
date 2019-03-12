@@ -127,7 +127,7 @@ def sample_sentence(hmm, obs_map, print_syllable = False, n_syllable = 10):
     sentence = [obs_map_r[i] for i in emission]
     if print_syllable == False:
         sentence = []
-        sentence = [obs_map_r[i].split('_')[0] for i in emissions]
+        sentence = [obs_map_r[i].split('_')[0] for i in emission]
     return ' '.join(sentence).capitalize()
 
 def sample_sentence_multipleModel(hmm_list, obs_map, print_syllable = False, n_syllable = 10):
@@ -214,15 +214,22 @@ def sample_sentence_multipleModel(hmm_list, obs_map, print_syllable = False, n_s
     return ' '.join(sentence).capitalize()
 
 
-def sample_stanza(hmm, obs_map, n_stanza = 4):
+def sample_sentence_rythme(hmm, obs_map, rthyme_pair_lib, print_syllable = False, n_syllable = 10):
+
     # Get reverse map.
-    stanza = [[],[],[],[]]
+    obs_map_r = obs_map_reverser(obs_map)
+
     # Sample and convert sentence.
-    if n_stanza == 4:
-        stanza[0] = sample_sentence(hmm,obs_map)
-        stanza[1] = sample_sentence(hmm,obs_map)
+    emission1,states1,emission2,states2 = hmm.generate_emission_reverse(obs_map_r, rthyme_pair_lib, n_syllable)
+    sentence1 = [obs_map_r[i] for i in emission1]
+    sentence2 = [obs_map_r[i] for i in emission2]
+    if print_syllable == False:
+        sentence1 = []
+        sentence1 = [obs_map_r[i].split('_')[0] for i in emission1]
+        sentence2 = []
+        sentence2 = [obs_map_r[i].split('_')[0] for i in emission2]
         
-        return ' '.join(stanza[0]).capitalize() + ',' + '\n' + ' '.join(stanza[1]).capitalize() +'.'
+    return ' '.join(sentence1).capitalize() +',' + ' '.join(sentence2).capitalize() 
 
 
 
