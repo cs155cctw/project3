@@ -627,8 +627,8 @@ class HiddenMarkovModel:
         states_1.append(random.choices(states_1_index, self.A_start)[0])
         states_2.append(random.choices(states_2_index, self.A_start)[0])
         
-        emission_rthyme_index_1 = int(rthyme_pair[rthyme_pair_loc_1])
-        emission_rthyme_index_2 = int(rthyme_pair[rthyme_pair_loc_2])
+        emission_1_rand_index = int(rthyme_pair[rthyme_pair_loc_1])
+        emission_2_rand_index = int(rthyme_pair[rthyme_pair_loc_2])
         
       
         
@@ -652,7 +652,8 @@ class HiddenMarkovModel:
         #print(self.O[9][emission_rthyme_index_1])
         
         
-        
+        #O_mat_1 = [self.O[j][emission_rthyme_index_1]/sum(np.array(self.O)[:,emission_rthyme_index_1]) for j in states_1_index]
+        #O_mat_2 = [self.O[j][emission_rthyme_index_2]/sum(np.array(self.O)[:,emission_rthyme_index_2]) for j in states_2_index]
         
 
 
@@ -663,11 +664,11 @@ class HiddenMarkovModel:
         #emission_1_rand_index = random.choices(states_1_index, O_mat_1)[0]
         #emission_2_rand_index = random.choices(states_2_index, O_mat_2)[0]
         
-        emission_1.append(emission_rthyme_index_1)
-        emission_2.append(emission_rthyme_index_2)
+        emission_1.append(emission_1_rand_index)
+        emission_2.append(emission_2_rand_index)
         
-        syllable_num_1 += int(obs_map_r[emission_rthyme_index_1].split('_')[1][-1])
-        syllable_num_2 += int(obs_map_r[emission_rthyme_index_2].split('_')[1][-1])
+        syllable_num_1 += int(obs_map_r[emission_1_rand_index].split('_')[1][-1])
+        syllable_num_2 += int(obs_map_r[emission_2_rand_index].split('_')[1][-1])
         
         wordnum_1 = 1
         wordnum_2 = 1
@@ -698,8 +699,8 @@ class HiddenMarkovModel:
                     if obs_map_r[i].split('_')[1][0] != 'E' and int(obs_map_r[i].split('_')[1][0]) + syllable_num_1 <= 10:
                         emission_1_index.append(i)
                 
-                O_mat_1 = [self.O[j][emission_rthyme_index_1]/sum(np.array(self.O)[:,emission_rthyme_index_1]) for j in states_1_index]
-                emission_1_rand_index = random.choices(states_1_index, O_mat_1)[0]
+                O_mat_1 = [self.O[states_1[wordnum_1]][i] for i in emission_1_index]
+                emission_1_rand_index = random.choices(emission_1_index, O_mat_1)[0]
                    
                 
                        
@@ -739,9 +740,8 @@ class HiddenMarkovModel:
                     if obs_map_r[i].split('_')[1][0] != 'E' and int(obs_map_r[i].split('_')[1][0]) + syllable_num_2 <= 10:
                         emission_2_index.append(i)
                 
-                O_mat_2 = [self.O[j][emission_rthyme_index_2]/sum(np.array(self.O)[:,emission_rthyme_index_2]) for j in states_2_index]
-        
-                emission_2_rand_index = random.choices(states_2_index, O_mat_2)[0]
+                O_mat_2 = [self.O[states_2[wordnum_2]][i] for i in emission_2_index]
+                emission_2_rand_index = random.choices(emission_2_index, O_mat_2)[0]
                    
                 
                        
