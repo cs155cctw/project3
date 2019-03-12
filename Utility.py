@@ -39,9 +39,10 @@ def get_syllabus(line, idx, syll_map):
     return syll        
 
     
-def get_poem_sequence(filename, option):
+def get_poem_sequence(filename, option='line',order='normal'):
     '''
     option: poem, line, stanza1, stanza2, stanza3, stanza4
+    order: normal, or reverse
     output: an array of sequence, each sequence is an array of encoded word for a poem, a stanza, or a line
     '''
 
@@ -104,9 +105,18 @@ def get_poem_sequence(filename, option):
         # ignore poem number
         if idx % 15 < 1:
             continue
+        # append a punctuation to the end if not present
+        if line[-1] != ',' and line[-1] != '.' and line[-1] != '?' and line[-1] != '!' and line[-1] != ';' and line[-1] != ':':
+            line.append(',')
         if (option == 'line') or (option == 'poem') or (option == 'stanza1' and (idx % 15 >= 1 and idx % 15 < 5 )) or (option == 'stanza2' and (idx % 15 >= 5 and idx % 15 < 9 )) or (option == 'stanza3' and (idx % 15 >= 9 and idx % 15 < 13 )) or (option == 'stanza4' and (idx % 15 >= 13 and idx % 15 < 15 )):
-            word_index_in_line = 0
-            for word in line:
+            
+            for word_index_in_line_normal in range(len(line)):
+                word_index_in_line = word_index_in_line_normal
+                if order == 'reverse':
+                    word_index_in_line = len(line) - 1 - word_index_in_line_normal
+                    
+                word = line[word_index_in_line]
+                 
                 if (word == ',') or (word == '.') or (word == '?') or (word == '!') or (word == ';') or (word == ':'):
                     word = word+'_0'
                     obs_Y_elem.append(11)
@@ -128,7 +138,7 @@ def get_poem_sequence(filename, option):
                     obs_counter += 1
                 # Add the encoded word.
                 obs_elem.append(obs_map[word])
-                word_index_in_line += 1
+                
 
         if option == 'line':
             obs.append(obs_elem)
@@ -186,3 +196,23 @@ def get_poem_sequence(filename, option):
                 obs_Y_elem = []
 
     return obs, obs_Y, obs_map
+
+def get_rhyme_pair(obs):
+    Pairs = []
+    increment = np.array([0,1,4,5,8,9,12])
+    number = int(len(obs)/14)
+    for index in range(number):
+        location = increment+14*index
+        for i in range(len(location)):
+            if (i < len(location)-1):
+                x = [obs[location[i]][1],obs[location[i]+2][1]]
+                Pairs.append(x)
+            if (i == len(location)-1):
+                x = [obs[location[i]][1],obs[location[i]+1][1]]
+                Pairs.append(x)
+    return Pairs
+
+
+
+
+
