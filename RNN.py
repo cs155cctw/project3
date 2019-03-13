@@ -12,8 +12,8 @@ dict_len = len(dict)
 
 # fix sequence length to 40 characters as required
 seq_size = 40
-# take sequence samples every 3 characters
-skip_step = 2
+# take sequence samples every 2 characters
+skip_step = 1
 batch_size = int(round((len(corpus)-seq_size)*1.0/skip_step))
 print('batch_size = ', batch_size)
 # generate sample x and y from shakespeare's poems
@@ -42,7 +42,7 @@ for temp in temp_list:
     model.compile(loss='categorical_crossentropy',optimizer='adam', metrics=['categorical_accuracy'])
     
     # change epochs to converge the accuracy
-    nepoch = 5
+    nepoch = 10
     fit = model.fit(x, y, batch_size=30, epochs=nepoch, verbose=1)
 
     model_file = 'model_t'+str(temp)+'_e'+str(nepoch)+'.h5'
@@ -55,7 +55,7 @@ for temp in temp_list:
     seed_sen[0,:,:] = seed_id
     poem_len = 14
     print('predict_tmp = 0.25')
-    pseudo_poem = poem_composer(model, seed_sen, poem_len, seq_size, dict, 0.2)
+    pseudo_poem = poem_composer(model, seed_sen, poem_len, seq_size, dict, 0.25)
     print(pseudo_poem)
 
     print('predict_tmp = 0.5')
@@ -63,7 +63,7 @@ for temp in temp_list:
     print(pseudo_poem)
 
     print('predict_tmp = 0.75')
-    pseudo_poem = poem_composer(model, seed_sen, poem_len, seq_size, dict, 1.0)
+    pseudo_poem = poem_composer(model, seed_sen, poem_len, seq_size, dict, 0.75)
     print(pseudo_poem)
 
     print('predict_tmp = 1.0')
@@ -71,21 +71,25 @@ for temp in temp_list:
     print(pseudo_poem)
 
     print('predict_tmp = 1.25')
-    pseudo_poem = poem_composer(model, seed_sen, poem_len, seq_size, dict, 1.2)
+    pseudo_poem = poem_composer(model, seed_sen, poem_len, seq_size, dict, 1.25)
     print(pseudo_poem)
 
     print('predict_tmp = 1.5')
-    pseudo_poem = poem_composer(model, seed_sen, poem_len, seq_size, dict, 1.2)
+    pseudo_poem = poem_composer(model, seed_sen, poem_len, seq_size, dict, 1.5)
     print(pseudo_poem)
 
-## reload files
+### reload files
 #for temp in temp_list:
 #    model = Sequential()
 #    model.add(LSTM(hidden_size,input_shape=(seq_size, dict_len)))
 #    model.add(Lambda(lambda x: x / temp))
 #    model.add(Dense(dict_len, activation = 'softmax'))
+#    model.summary()
 #    model.compile(loss='categorical_crossentropy',optimizer='adam', metrics=['categorical_accuracy'])
-#    model_file = 'model_t'+str(temp)+'.h5'
+#    nepoch =
+#    model_file = 'model_t'+str(temp)+'_e'+str(nepoch)+'.h5'
 #    model.load_weights(model_file)
-#    pseudo_poem = poem_composer(model, seed_sen, poem_len, seq_size, dict, temp)
+#    poem_len = 14
+#    predict_tmp = 
+#    pseudo_poem = poem_composer(model, seed_sen, poem_len, seq_size, dict, predict_tmp)
 #    print(pseudo_poem)
