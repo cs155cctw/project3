@@ -79,7 +79,7 @@ def RNN_data_generator(corpus, seq_size, batch_size, dict_len, skip_step):
             idx_end = idx_start + seq_size
         tmp_x = corpus[idx_start:idx_end]
         x[idx, :, :] = to_categorical(tmp_x, num_classes=dict_len)
-        tmp_y = corpus[idx_end+1]
+        tmp_y = corpus[idx_end]
         y[idx, :] = to_categorical(tmp_y, num_classes=dict_len)
         idx_start += skip_step
 
