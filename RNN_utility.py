@@ -116,14 +116,15 @@ def poem_composer(model, seed_sen, poem_len, seq_size, dict, temperature):
     pseudo_poem = ''
     dict_len = len(dict)
     for idx in range(poem_len):
-        test = model.predict(seed_sen)
-        prediction = model.predict(seed_sen)[0]
-        id = sample(prediction, temperature)
-        #id = id_list[:,seq_size-1]
-        #id_list = np.argmax(prediction[:, seq_size-1, :])
-        pseudo_poem += id_to_char(id, dict)
-        next_sen = np.zeros((1, seq_size, dict_len))
-        next_sen[0,:seq_size-1,:] = seed_sen[0, 1:, :]
-        next_sen[0,seq_size-1,:] = to_categorical(id, num_classes=dict_len)
-        seed_sen = next_sen
+        for char_idx in range(seq_size):
+            test = model.predict(seed_sen)
+            prediction = model.predict(seed_sen)[0]
+            id = sample(prediction, temperature)
+            #id = id_list[:,seq_size-1]
+            pseudo_poem += id_to_char(id, dict)
+            next_sen = np.zeros((1, seq_size, dict_len))
+            next_sen[0,:seq_size-1,:] = seed_sen[0, 1:, :]
+            next_sen[0,seq_size-1,:] = to_categorical(id, num_classes=dict_len)
+            seed_sen = next_sen
+        pseudo_poem += ' \n '
     return pseudo_poem
