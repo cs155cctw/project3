@@ -13,7 +13,7 @@ dict_len = len(dict)
 # fix sequence length to 40 characters as required
 seq_size = 40
 # take sequence samples every 3 characters
-skip_step = 3
+skip_step = 1
 batch_size = int(round((len(corpus)-seq_size)*1.0/skip_step))
 print('batch_size = ', batch_size)
 # generate sample x and y from shakespeare's poems
