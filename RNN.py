@@ -13,7 +13,7 @@ dict_len = len(dict)
 # fix sequence length to 40 characters as required
 seq_size = 40
 # take sequence samples every 3 characters
-skip_step = 1
+skip_step = 2
 batch_size = int(round((len(corpus)-seq_size)*1.0/skip_step))
 print('batch_size = ', batch_size)
 # generate sample x and y from shakespeare's poems
@@ -42,18 +42,40 @@ for temp in temp_list:
     model.compile(loss='categorical_crossentropy',optimizer='adam', metrics=['categorical_accuracy'])
     
     # change epochs to converge the accuracy
-    fit = model.fit(x, y, batch_size=30, epochs=40, verbose=1)
+    nepoch = 5
+    fit = model.fit(x, y, batch_size=30, epochs=nepoch, verbose=1)
 
-    model_file = 'model_t'+str(temp)+'.h5'
+    model_file = 'model_t'+str(temp)+'_e'+str(nepoch)+'.h5'
     model.save_weights(model_file)
 
     # seed sentence
-    seed = "shall i compare thee to a summer's day?\n"
+    seed = "shall i compare thee to a summer's day? "
     seed_id = sentence_to_id(seed, dict)
     seed_sen = np.zeros((1, seq_size, dict_len))
     seed_sen[0,:,:] = seed_id
-    poem_len = 800
-    pseudo_poem = poem_composer(model, seed_sen, poem_len, seq_size, dict, temp)
+    poem_len = 14
+    print('predict_tmp = 0.25')
+    pseudo_poem = poem_composer(model, seed_sen, poem_len, seq_size, dict, 0.2)
+    print(pseudo_poem)
+
+    print('predict_tmp = 0.5')
+    pseudo_poem = poem_composer(model, seed_sen, poem_len, seq_size, dict, 0.5)
+    print(pseudo_poem)
+
+    print('predict_tmp = 0.75')
+    pseudo_poem = poem_composer(model, seed_sen, poem_len, seq_size, dict, 1.0)
+    print(pseudo_poem)
+
+    print('predict_tmp = 1.0')
+    pseudo_poem = poem_composer(model, seed_sen, poem_len, seq_size, dict, 1.0)
+    print(pseudo_poem)
+
+    print('predict_tmp = 1.25')
+    pseudo_poem = poem_composer(model, seed_sen, poem_len, seq_size, dict, 1.2)
+    print(pseudo_poem)
+
+    print('predict_tmp = 1.5')
+    pseudo_poem = poem_composer(model, seed_sen, poem_len, seq_size, dict, 1.2)
     print(pseudo_poem)
 
 ## reload files
