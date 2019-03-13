@@ -30,10 +30,11 @@ def poem_to_id(filename):
                     if char == '':
                         continue
                     raw_corpus+= char
-            if word_idx == len(line) - 1:
-                raw_corpus += '\n'
-            else:
-                raw_corpus += ' '
+            raw_corpus += ' '
+            #if word_idx == len(line) - 1:
+            #    raw_corpus += '\n'
+            #else:
+            #    raw_corpus += ' '
 
     for char in raw_corpus:
         if char not in char_map:
