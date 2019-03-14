@@ -821,3 +821,17 @@ def unsupervised_HMM(X, n_states, N_iters, seedn):
     HMM.unsupervised_learning(X, N_iters)
 
     return HMM
+
+def merge_HMM (hmm_list):
+    AA = [[0 for i in range(hmm_list[0].L)] for j in range(hmm_list[0].L)];
+    OO = O = [[0 for i in range(hmm_list[0].D)] for j in range(hmm_list[0].L)];
+    
+    for index in range(len(hmm_list)):
+        for state_index in range(hmm_list[0].L):
+            for emission_index in range(hmm_list[0].D):
+                OO[state_index][emission_index] += hmm_list[index].O[state_index][emission_index]/len(hmm_list)
+            for state_index_next in range(hmm_list[0].L):
+                AA[state_index][state_index_next] += hmm_list[index].A[state_index][state_index_next]/len(hmm_list)
+    HMM = HiddenMarkovModel(AA, OO)
+    return HMM
+    
