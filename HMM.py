@@ -93,7 +93,7 @@ class HiddenMarkovModel:
                         consisting of integers ranging from 0 to D - 1.
 
         Returns:
-            max_seq:    State sequence corresponding to x with the highest
+            max_seq:    Output sequence corresponding to x with the highest
                         probability.
         '''
 
@@ -108,36 +108,39 @@ class HiddenMarkovModel:
         probs = [[0. for _ in range(self.L)] for _ in range(M + 1)]
         seqs = [['' for _ in range(self.L)] for _ in range(M + 1)]
 
-        # prob[0] is the start state, let the entried remain zero
-        # Initialize probs[1] and seqs[1] first
-        for index in range(self.L):
-            probs[1][index] = self.A_start[index]*self.O[index][x[0]]
-            seqs[1][index] = str(index)
+        # Calculate initial prefixes and probabilities.
+        for curr in range(self.L):
+            probs[1][curr] = self.A_start[curr] * self.O[curr][x[0]]
+            seqs[1][curr] = str(curr)
 
-        for sequence_index in range(M):
-            if sequence_index > 0:
-               for state_index in range(self.L):
-                   max_prob_temp = 0
-                   max_index = 0
-                   for last_sequence_state_index in range(self.L):
-                       prob_temp = probs[sequence_index][last_sequence_state_index]*self.A[last_sequence_state_index][state_index]*self.O[state_index][x[sequence_index]]
-                       if max_prob_temp < prob_temp:
-                          max_prob_temp = prob_temp
-                          max_index = last_sequence_state_index
-                   probs[sequence_index+1][state_index] = max_prob_temp
-                   seqs[sequence_index+1][state_index] = seqs[sequence_index][max_index]+str(state_index)
-        ###
-        ###
-        ### 
-        ### TODO: Insert Your Code Here (2A)
-        ###
-        ###
-        ###
-        prob_temp = 0
-        for index in range(self.L):
-            if prob_temp < probs[M][index]:
-               prob_temp = probs[M][index]
-               max_seq = seqs[M][index]
+        # Calculate best prefixes and probabilities throughout sequence.
+        for t in range(2, M + 1):
+            # Iterate over all possible current states.
+            for curr in range(self.L):
+                max_prob = float("-inf")
+                max_prefix = ''
+
+                # Iterate over all possible previous states to find one
+                # that would maximize the probability of the current state.
+                for prev in range(self.L):
+                    curr_prob = probs[t - 1][prev] \
+                                * self.A[prev][curr] \
+                                * self.O[curr][x[t - 1]]
+
+                    # Continually update max probability and prefix.
+                    if curr_prob >= max_prob:
+                        max_prob = curr_prob
+                        max_prefix = seqs[t - 1][prev]
+
+                # Store the max probability and prefix.
+                probs[t][curr] = max_prob
+                seqs[t][curr] = max_prefix + str(curr)
+
+        # Find the index of the max probability of a sequence ending in x^M
+        # and the corresponding output sequence.
+        max_i = max(enumerate(probs[-1]), key=lambda x: x[1])[0]
+        max_seq = seqs[-1][max_i]
+
         return max_seq
 
 
@@ -168,36 +171,33 @@ class HiddenMarkovModel:
 
         M = len(x)      # Length of sequence.
         alphas = [[0. for _ in range(self.L)] for _ in range(M + 1)]
-        # Intialize alpha[1] since its dependence on alpha[0] is special
-        start_sum = 0
-        for state_index in range(self.L):
-            alphas[1][state_index] = self.O[state_index][x[0]]*1*self.A_start[state_index]
-            start_sum += self.O[state_index][x[0]]*1*self.A_start[state_index]
-        if normalize:
-           for index in range(self.L):
-               alphas[1][index] /= start_sum
 
-        # compute from sequence with 2 words to those of M words
-        for sequence_index in range(M):
-            if sequence_index > 0:
-               sequence_sum = 0 # in case of normalization
-               for state_index in range(self.L): # loop through each possible state
-                   alpha_last_sum = 0 # initialize the alpha_sum from previous sequence
-                   for last_sequence_state_index in range(self.L):
-                       alpha_last_sum += alphas[sequence_index][last_sequence_state_index]*self.A[last_sequence_state_index][state_index]
-                   alphas[sequence_index+1][state_index] = self.O[state_index][x[sequence_index]]*alpha_last_sum
-                   sequence_sum += self.O[state_index][x[sequence_index]]*alpha_last_sum
-                # apply normalization if normalize == true after computation ends for each index
-               if normalize:
-                  for index in range(self.L):
-                      alphas[sequence_index+1][index] /= sequence_sum        
-        ###
-        ###
-        ### 
-        ### TODO: Insert Your Code Here (2Bi)
-        ###
-        ###
-        ###
+        # Note that alpha_j(0) is already correct for all j's.
+        # Calculate alpha_j(1) for all j's.
+        for curr in range(self.L):
+            alphas[1][curr] = self.A_start[curr] * self.O[curr][x[0]]
+
+        # Calculate alphas throughout sequence.
+        for t in range(1, M):
+            # Iterate over all possible current states.
+            for curr in range(self.L):
+                prob = 0
+
+                # Iterate over all possible previous states to accumulate
+                # the probabilities of all paths from the start state to
+                # the current state.
+                for prev in range(self.L):
+                    prob += alphas[t][prev] \
+                            * self.A[prev][curr] \
+                            * self.O[curr][x[t]]
+
+                # Store the accumulated probability.
+                alphas[t + 1][curr] = prob
+
+            if normalize:
+                norm = sum(alphas[t + 1])
+                for curr in range(self.L):
+                    alphas[t + 1][curr] /= norm
 
         return alphas
 
@@ -229,35 +229,38 @@ class HiddenMarkovModel:
 
         M = len(x)      # Length of sequence.
         betas = [[0. for _ in range(self.L)] for _ in range(M + 1)]
-        # Initialize betas[M]
-        for index in range(self.L):
-            betas[M][index] = 1
-        if normalize:
-           for index in range(self.L):
-               betas[M][index] = 1./self.L
-        # loop starts from M-1
-        for index in range(M):
-            if index > 0:
-               sequence_index = M-index
-               sequence_sum = 0
-               for state_index in range(self.L):
-                   for next_state_index in range(self.L):
-                       betas[sequence_index][state_index] += betas[sequence_index+1][next_state_index]*self.A[state_index][next_state_index]*self.O[next_state_index][x[sequence_index]]
-                   sequence_sum += betas[sequence_index][state_index]
-               if normalize:
-                  for index in range(self.L):
-                      betas[sequence_index][index] /= sequence_sum
 
+        # Initialize initial betas.
+        for curr in range(self.L):
+            betas[-1][curr] = 1
 
+        # Calculate betas throughout sequence.
+        for t in range(-1, -M - 1, -1):
+            # Iterate over all possible current states.
+            for curr in range(self.L):
+                prob = 0
 
+                # Iterate over all possible next states to accumulate
+                # the probabilities of all paths from the end state to
+                # the current state.
+                for nxt in range(self.L):
+                    if t == -M:
+                        prob += betas[t][nxt] \
+                                * self.A_start[nxt] \
+                                * self.O[nxt][x[t]]
 
-        ###
-        ###
-        ### 
-        ### TODO: Insert Your Code Here (2Bii)
-        ###
-        ###
-        ###
+                    else:
+                        prob += betas[t][nxt] \
+                                * self.A[curr][nxt] \
+                                * self.O[nxt][x[t]]
+
+                # Store the accumulated probability.
+                betas[t - 1][curr] = prob
+
+            if normalize:
+                norm = sum(betas[t - 1])
+                for curr in range(self.L):
+                    betas[t - 1][curr] /= norm
 
         return betas
 
@@ -284,50 +287,40 @@ class HiddenMarkovModel:
         '''
 
         # Calculate each element of A using the M-step formulas.
-        for current_state in range(self.L):
-            for next_state in range(self.L):
-                numerator = 0
-                denominator = 0
-                for index in range(len(Y)):
-                    for list_index in range(len(Y[index])-1):
-                        if (Y[index][list_index] == current_state):
-                            denominator += 1
-                            if (Y[index][list_index+1] == next_state):
-                               numerator += 1
+        for curr in range(self.L):
+            for nxt in range(self.L):
+                num = 0.
+                den = 0.
 
-                self.A[current_state][next_state] = numerator/denominator
+                for i in range(len(X)):
+                    x = X[i]
+                    y = Y[i]
+                    M = len(x)
+        
+                    num += len([1 for i in range(M - 1) \
+                                if y[i] == curr and y[i + 1] == nxt])
+                    den += len([1 for i in range(M - 1) if y[i] == curr])
 
-        ###
-        ###
-        ### 
-        ### TODO: Insert Your Code Here (2C)
-        ###
-        ###
-        ###
+                self.A[curr][nxt] = num / den
 
         # Calculate each element of O using the M-step formulas.
-        for state_index in range(self.L):
-            for emission_state in range(self.D):
-                numerator = 0
-                denominator = 0
-                for index in range(len(Y)):
-                    for list_index in range(len(Y[index])):
-                        if (Y[index][list_index] == state_index):
-                            denominator += 1
-                            if (X[index][list_index] == emission_state):
-                                numerator += 1
-                self.O[state_index][emission_state] = numerator/denominator
-        ###
-        ###
-        ### 
-        ### TODO: Insert Your Code Here (2C)
-        ###
-        ###
-        ###
+        for curr in range(self.L):
+            for xt in range(self.D):
+                num = 0.
+                den = 0.
 
-        pass
+                for i in range(len(X)):
+                    x = X[i]
+                    y = Y[i]
+                    M = len(x)
+        
+                    num += len([1 for i in range(M) \
+                                if y[i] == curr and x[i] == xt])
+                    den += len([1 for i in range(M) if y[i] == curr])
 
-
+                self.O[curr][xt] = num / den
+                
+  
     def unsupervised_learning(self, X, N_iters):
         '''
         Trains the HMM using the Baum-Welch algorithm on an unlabeled
@@ -341,86 +334,81 @@ class HiddenMarkovModel:
 
             N_iters:    The number of iterations to train on.
         '''
-        normalize = True
-        for iteration in range(N_iters):
-            if iteration%10 == 0:
-                print('iteration '+str(iteration))
-            P_y_xall = []
-            P_ylast_ycurrent_xall = []
 
-            for input_index in range(len(X)):
-                xi = X[input_index]
-                Mi = len(xi)
-                alphas = self.forward(xi,normalize)
-                betas = self.backward(xi,normalize)
-                P_currentstate_xi = [[0. for _ in range(self.L)] for _ in range(Mi)]
-                P_laststate_currentstate_xi = []
-                denominator1 = [0. for _ in range(Mi)]
-                denominator2 = [0. for _ in range(Mi-1)]
+        # Note that a comment starting with 'E' refers to the fact that
+        # the code under the comment is part of the E-step.
 
-                # compute P(y^j=a,xi) and P(y^j=a,y^j+1=b,xi)
-                for sequence_index in range(Mi):
-                    for state_index in range(self.L):
-                        denominator1[sequence_index] += alphas[sequence_index+1][state_index] * betas[sequence_index+1][state_index]
-                
-                for sequence_index in range(Mi):
-                    for state_index in range(self.L):
-                        P_currentstate_xi[sequence_index][state_index] = alphas[sequence_index+1][state_index]*betas[sequence_index+1][state_index]/denominator1[sequence_index]
+        # Similarly, a comment starting with 'M' refers to the fact that
+        # the code under the comment is part of the M-step.
 
+        for iteration in range(1, N_iters + 1):
+            if iteration % 1 == 0:
+                print("Iteration: " + str(iteration))
 
-                for sequence_index in range(Mi-1):
-                    for state_index_a in range(self.L):
-                        for state_index_b in range(self.L):
-                            denominator2[sequence_index] += alphas[sequence_index+1][state_index_a]*betas[sequence_index+2][state_index_b]*\
-                            self.O[state_index_b][xi[sequence_index+1]]*self.A[state_index_a][state_index_b]
+            # Numerator and denominator for the update terms of A and O.
+            A_num = [[0. for i in range(self.L)] for j in range(self.L)]
+            O_num = [[0. for i in range(self.D)] for j in range(self.L)]
+            A_den = [0. for i in range(self.L)]
+            O_den = [0. for i in range(self.L)]
 
-                for sequence_index in range(Mi-1):
-                    P_laststate_currentstate_xi.append([[0. for _ in range(self.L)] for _ in range(self.L)])
-                    for last_state in range(self.L):
-                        for current_state in range(self.L):
-                            P_laststate_currentstate_xi[sequence_index][last_state][current_state] = alphas[sequence_index+1][last_state]*\
-                            betas[sequence_index+2][current_state]*self.A[last_state][current_state]*self.O[current_state][xi[sequence_index+1]]/denominator2[sequence_index]
+            # For each input sequence:
+            for x in X:
+                M = len(x)
+                # Compute the alpha and beta probability vectors.
+                alphas = self.forward(x, normalize=True)
+                betas = self.backward(x, normalize=True)
 
-                P_y_xall.append(P_currentstate_xi)
-                P_ylast_ycurrent_xall.append(P_laststate_currentstate_xi)
+                # E: Update the expected observation probabilities for a
+                # given (x, y).
+                # The i^th index is P(y^t = i, x).
+                for t in range(1, M + 1):
+                    P_curr = [0. for _ in range(self.L)]
+                    
+                    for curr in range(self.L):
+                        P_curr[curr] = alphas[t][curr] * betas[t][curr]
 
-            # now start to update A and O
-            for last_state_index in range(self.L):
-                for current_state_index in range(self.L):
+                    # Normalize the probabilities.
+                    norm = sum(P_curr)
+                    for curr in range(len(P_curr)):
+                        P_curr[curr] /= norm
 
-                    numerator = 0
-                    denominator = 0
-                    for index in range(len(X)):
-                        Mi = len(X[index])
-                        for sequence_index in range(Mi-1):
-                            numerator +=  P_ylast_ycurrent_xall[index][sequence_index][last_state_index][current_state_index]
-                            denominator += P_y_xall[index][sequence_index][last_state_index]
-                    self.A[last_state_index][current_state_index] = numerator/denominator
+                    for curr in range(self.L):
+                        if t != M:
+                            A_den[curr] += P_curr[curr]
+                        O_den[curr] += P_curr[curr]
+                        O_num[curr][x[t - 1]] += P_curr[curr]
 
-            for state_index in range(self.L):
-                for emission_index in range(self.D):
+                # E: Update the expectedP(y^j = a, y^j+1 = b, x) for given (x, y)
+                for t in range(1, M):
+                    P_curr_nxt = [[0. for _ in range(self.L)] for _ in range(self.L)]
 
-                    numerator = 0
-                    denominator = 0
-                    for index in range(len(X)):
-                        Mi = len(X[index])
-                        for sequence_index in range(Mi):
-                            if (X[index][sequence_index] == emission_index):
-                               numerator += P_y_xall[index][sequence_index][state_index]
-                            denominator += P_y_xall[index][sequence_index][state_index]
-                    self.O[state_index][emission_index] = numerator/denominator
+                    for curr in range(self.L):
+                        for nxt in range(self.L):
+                            P_curr_nxt[curr][nxt] = alphas[t][curr] \
+                                                    * self.A[curr][nxt] \
+                                                    * self.O[nxt][x[t]] \
+                                                    * betas[t + 1][nxt]
 
-        # checked for indexing: states: happy-0, mellow-1, sad-2, angry-3
-        # genres: rock-0, pop-1, house-2, metal-3, folk-4, blues-5, dubstep-6, jazz-7, rap-8, classical-9
-        ###
-        ###
-        ### 
-        ### TODO: Insert Your Code Here (2D)
-        ###
-        ###
-        ###
+                    # Normalize:
+                    norm = 0
+                    for lst in P_curr_nxt:
+                        norm += sum(lst)
+                    for curr in range(self.L):
+                        for nxt in range(self.L):
+                            P_curr_nxt[curr][nxt] /= norm
 
-        pass
+                    # Update A_num
+                    for curr in range(self.L):
+                        for nxt in range(self.L):
+                            A_num[curr][nxt] += P_curr_nxt[curr][nxt]
+
+            for curr in range(self.L):
+                for nxt in range(self.L):
+                    self.A[curr][nxt] = A_num[curr][nxt] / A_den[curr]
+
+            for curr in range(self.L):
+                for xt in range(self.D):
+                    self.O[curr][xt] = O_num[curr][xt] / O_den[curr]
 
 
     def generate_emission(self,obs_map_r, M=10):
@@ -698,10 +686,10 @@ class HiddenMarkovModel:
         # Calculate alpha vectors.
         alphas = self.forward(x)
 
-        # alpha_j(M) gives the probability that the state sequence ends
+        # alpha_j(M) gives the probability that the output sequence ends
         # in j. Summing this value over all possible states j gives the
-        # total probability of x paired with any state sequence, i.e.
-        # the probability of x.
+        # total probability of x paired with any output sequence, i.e. the
+        # probability of x.
         prob = sum(alphas[-1])
         return prob
 
@@ -721,13 +709,12 @@ class HiddenMarkovModel:
 
         betas = self.backward(x)
 
-        # beta_j(1) gives the probability that the state sequence starts
-        # with j. Summing this, multiplied by the starting transition
-        # probability and the observation probability, over all states
-        # gives the total probability of x paired with any state
-        # sequence, i.e. the probability of x.
-        prob = sum([betas[1][j] * self.A_start[j] * self.O[j][x[0]] \
-                    for j in range(self.L)])
+        # beta_j(0) gives the probability of the output sequence. Summing
+        # this over all states and then normalizing gives the total
+        # probability of x paired with any output sequence, i.e. the
+        # probability of x.
+        prob = sum([betas[1][k] * self.A_start[k] * self.O[k][x[0]] \
+            for k in range(self.L)])
 
         return prob
 
