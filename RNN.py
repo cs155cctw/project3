@@ -13,7 +13,7 @@ dict_len = len(dict)
 # fix sequence length to 40 characters as required
 seq_size = 40
 # take sequence samples every 2 characters
-skip_step = 1
+skip_step = 3
 batch_size = int(round((len(corpus)-seq_size)*1.0/skip_step))
 print('batch_size = ', batch_size)
 # generate sample x and y from shakespeare's poems
@@ -23,7 +23,7 @@ x, y = RNN_data_generator(corpus, seq_size, batch_size, dict_len, skip_step)
 hidden_size = 150
 
 # modify the temperature to obtain different probabiliy distribution
-temp_list = [0.25, 0.75, 1.5]
+temp_list = [0.75] #[0.25, 0.75, 1.5]
 for temp in temp_list:
     # Model created with constraints in the problem
     model = Sequential()
@@ -42,7 +42,7 @@ for temp in temp_list:
     model.compile(loss='categorical_crossentropy',optimizer='adam', metrics=['categorical_accuracy'])
     
     # change epochs to converge the accuracy
-    nepoch = 10
+    nepoch = 150
     fit = model.fit(x, y, batch_size=30, epochs=nepoch, verbose=1)
 
     model_file = 'model_t'+str(temp)+'_e'+str(nepoch)+'.h5'
