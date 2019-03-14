@@ -342,7 +342,7 @@ class HiddenMarkovModel:
         # the code under the comment is part of the M-step.
 
         for iteration in range(1, N_iters + 1):
-            if iteration % 1 == 0:
+            if iteration % 10 == 0:
                 print("Iteration: " + str(iteration))
 
             # Numerator and denominator for the update terms of A and O.

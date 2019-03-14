@@ -230,11 +230,20 @@ def sample_sentence_multipleModel_rythme(hmm_list, obs_map, rthyme_pair_lib, pri
     emission_index_1 = range(hmm_list[0].D)
     emission_index_2 = range(hmm_list[0].D)
     
+    probabilities_1_start = []
+    probabilities_2_start = []
+    
+    emission_index_1_start = []
+    emission_index_2_start = []
+    
     states_previous_1 = []
     states_previous_2 = []
     
     multiply_factor_1 = np.ones(hmm_list[0].D)
     multiply_factor_2 = np.ones(hmm_list[0].D)
+    
+    multiply_factor_1_start = []
+    multiply_factor_2_start = []
     
     for idx_hmm in range(len(hmm_list)):
         states_index = range(hmm_list[idx_hmm].L)
@@ -245,14 +254,19 @@ def sample_sentence_multipleModel_rythme(hmm_list, obs_map, rthyme_pair_lib, pri
             probabilities_1[idx_obs] += hmm_list[idx_hmm].O[state][idx_obs]
             if (idx_hmm == 0 and hmm_list[0].O[state][idx_obs] == 0.0) or (obs_map_r[idx_obs].split('_')[1][0] == 'E') or (not np.isin(idx_obs, rthyme_pair_lib)):
                 multiply_factor_1[idx_obs] = 0.0
+            else:
+                emission_index_1_start.append(idx_obs)
+                multiply_factor_1_start.append(1.0)
+                probabilities_1_start.append(hmm_list[idx_hmm].O[state][idx_obs])
+                
     sum_P_1 = 0.0
-    for idx_obs in range(hmm_list[idx_hmm].D):
-        probabilities_1[idx_obs] = probabilities_1[idx_obs] * multiply_factor_1[idx_obs]
-        sum_P_1 += probabilities_1[idx_obs]
+    for idx_obs in range(len(probabilities_1_start)):
+        probabilities_1_start[idx_obs] = probabilities_1_start[idx_obs] * multiply_factor_1_start[idx_obs]
+        sum_P_1 += probabilities_1_start[idx_obs]
     if sum_P_1 > 0:
-        for idx_obs in range(hmm_list[idx_hmm].D):
-            probabilities_1[idx_obs] = probabilities_1[idx_obs]/sum_P_1
-    emission_1_rand_index = random.choices(emission_index_1, probabilities_1)[0]
+        for idx_obs in range(len(probabilities_1_start)):
+            probabilities_1_start[idx_obs] = probabilities_1_start[idx_obs]/sum_P_1
+    emission_1_rand_index = random.choices(np.array(emission_index_1_start), np.array(probabilities_1_start))[0]
     emissions_1.append(emission_1_rand_index)
     if obs_map_r[emission_1_rand_index].split('_')[1][0] == 'E':
         syllable_num_1 += int(obs_map_r[emission_1_rand_index].split('_')[1][1])
