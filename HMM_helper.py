@@ -213,6 +213,151 @@ def sample_sentence_multipleModel(hmm_list, obs_map, print_syllable = False, n_s
 
     return ' '.join(sentence).capitalize()
 
+def sample_sentence_multipleModel_rythme(hmm_list, obs_map, rthyme_pair_lib, print_syllable = False, n_syllable = 10):
+    # Get reverse map.
+    obs_map_r = obs_map_reverser(obs_map)
+
+    # Sample and convert sentence_1.
+    # emission, states = hmm.generate_emission(n_syllable)
+    
+    emissions_1 = []
+    emissions_2 = []
+    syllable_num_1 = 0.0
+    syllable_num_2 = 0.0
+    
+    probabilities_1 = np.zeros(hmm_list[0].D)
+    probabilities_2 = np.zeros(hmm_list[0].D)
+    emission_index_1 = range(hmm_list[0].D)
+    emission_index_2 = range(hmm_list[0].D)
+    
+    states_previous_1 = []
+    states_previous_2 = []
+    
+    multiply_factor_1 = np.ones(hmm_list[0].D)
+    multiply_factor_2 = np.ones(hmm_list[0].D)
+    
+    for idx_hmm in range(len(hmm_list)):
+        states_index = range(hmm_list[idx_hmm].L)
+        state = random.choices(states_index, hmm_list[idx_hmm].A_start)[0]
+        states_previous_1.append(state)
+        
+        for idx_obs in range(hmm_list[idx_hmm].D):
+            probabilities_1[idx_obs] += hmm_list[idx_hmm].O[state][idx_obs]
+            if (idx_hmm == 0 and hmm_list[0].O[state][idx_obs] == 0.0) or (obs_map_r[idx_obs].split('_')[1][0] == 'E') or (not np.isin(idx_obs, rthyme_pair_lib)):
+                multiply_factor_1[idx_obs] = 0.0
+    sum_P_1 = 0.0
+    for idx_obs in range(hmm_list[idx_hmm].D):
+        probabilities_1[idx_obs] = probabilities_1[idx_obs] * multiply_factor_1[idx_obs]
+        sum_P_1 += probabilities_1[idx_obs]
+    if sum_P_1 > 0:
+        for idx_obs in range(hmm_list[idx_hmm].D):
+            probabilities_1[idx_obs] = probabilities_1[idx_obs]/sum_P_1
+    emission_1_rand_index = random.choices(emission_index_1, probabilities_1)[0]
+    emissions_1.append(emission_1_rand_index)
+    if obs_map_r[emission_1_rand_index].split('_')[1][0] == 'E':
+        syllable_num_1 += int(obs_map_r[emission_1_rand_index].split('_')[1][1])
+    else:
+        syllable_num_1 += int(obs_map_r[emission_1_rand_index].split('_')[1][0])
+    
+    #now determine the first word for the second line
+    allPair = np.where(np.array(rthyme_pair_lib) == emission_1_rand_index)
+    emission_2_candidates = []
+    for idx in range(len(allPair[0])):
+        emission_2_candidates.append(rthyme_pair_lib[allPair[0][idx]][1-allPair[1][idx]])
+    emission_2_rand_index = random.choice(emission_2_candidates)
+    emissions_2.append(emission_2_rand_index)
+    if obs_map_r[emission_2_rand_index].split('_')[1][0] == 'E':
+        syllable_num_2 += int(obs_map_r[emission_2_rand_index].split('_')[1][1])
+    else:
+        syllable_num_2 += int(obs_map_r[emission_2_rand_index].split('_')[1][0])
+    #now determine the state for the first word
+    for idx_hmm in range(len(hmm_list)):
+        states_index = range(hmm_list[idx_hmm].L)
+        probabilities_states = np.array(hmm_list[idx_hmm].O)[:,emission_2_rand_index]
+        sum_P_states = np.sum(probabilities_states)
+        probabilities_states = probabilities_states/sum_P_states
+        state = random.choices(states_index, probabilities_states)[0]
+        states_previous_2.append(state)
+    
+    while syllable_num_1 < n_syllable:
+        probabilities_1 = np.zeros(hmm_list[0].D)
+        multiply_factor_1 = np.ones(hmm_list[0].D)
+        for idx_hmm in range(len(hmm_list)):
+            states_index = range(hmm_list[idx_hmm].L)
+            state = random.choices(states_index,hmm_list[idx_hmm].A[states_previous_1[idx_hmm]])[0]
+            states_previous_1[idx_hmm] = state
+            
+            for idx_obs in range(hmm_list[idx_hmm].D):
+                probabilities_1[idx_obs] += hmm_list[idx_hmm].O[state][idx_obs]
+                if idx_hmm == 0 and hmm_list[0].O[state][idx_obs] == 0.0:
+                    multiply_factor_1[idx_obs] = 0.0
+                syllable_num_1_this = 0
+                if obs_map_r[idx_obs].split('_')[1][0] == 'E':
+                    multiply_factor_1[idx_obs] = 0.0
+                else:
+                    syllable_num_1_this = int(obs_map_r[idx_obs].split('_')[1][0])
+                    if syllable_num_1_this + syllable_num_1 > 10:
+                        multiply_factor_1[idx_obs] = 0.0
+        sum_P_1 = 0.0
+        for idx_obs in range(hmm_list[idx_hmm].D):
+            probabilities_1[idx_obs] = probabilities_1[idx_obs] * multiply_factor_1[idx_obs]
+            sum_P_1 = sum_P_1 + probabilities_1[idx_obs]
+        if sum_P_1 > 0:
+            for idx_obs in range(hmm_list[idx_hmm].D):
+                probabilities_1[idx_obs] = probabilities_1[idx_obs]/sum_P_1
+        
+        emission_1_rand_index = random.choices(emission_index_1, probabilities_1)[0]
+        emissions_1.append(emission_1_rand_index)
+        if obs_map_r[emission_1_rand_index].split('_')[1][0] == 'E':
+            syllable_num_1 = syllable_num_1 + int(obs_map_r[emission_1_rand_index].split('_')[1][1])
+        else:
+            syllable_num_1 = syllable_num_1 + int(obs_map_r[emission_1_rand_index].split('_')[1][0])
+    while syllable_num_2 < n_syllable:
+        probabilities_2 = np.zeros(hmm_list[0].D)
+        multiply_factor_2 = np.ones(hmm_list[0].D)
+        for idx_hmm in range(len(hmm_list)):
+            states_index = range(hmm_list[idx_hmm].L)
+            state = random.choices(states_index,hmm_list[idx_hmm].A[states_previous_2[idx_hmm]])[0]
+            states_previous_2[idx_hmm] = state
+            
+            for idx_obs in range(hmm_list[idx_hmm].D):
+                probabilities_2[idx_obs] += hmm_list[idx_hmm].O[state][idx_obs]
+                if idx_hmm == 0 and hmm_list[0].O[state][idx_obs] == 0.0:
+                    multiply_factor_2[idx_obs] = 0.0
+                syllable_num_2_this = 0
+                if obs_map_r[idx_obs].split('_')[1][0] == 'E':
+                    multiply_factor_2[idx_obs] = 0.0
+                else:
+                    syllable_num_2_this = int(obs_map_r[idx_obs].split('_')[1][0])
+                    if syllable_num_2_this + syllable_num_2 > 10:
+                        multiply_factor_2[idx_obs] = 0.0
+        sum_P_2 = 0.0
+        for idx_obs in range(hmm_list[idx_hmm].D):
+            probabilities_2[idx_obs] = probabilities_2[idx_obs] * multiply_factor_2[idx_obs]
+            sum_P_2 = sum_P_2 + probabilities_2[idx_obs]
+        if sum_P_2 > 0:
+            for idx_obs in range(hmm_list[idx_hmm].D):
+                probabilities_2[idx_obs] = probabilities_2[idx_obs]/sum_P_2
+        
+        emission_2_rand_index = random.choices(emission_index_2, probabilities_2)[0]
+        emissions_2.append(emission_2_rand_index)
+        if obs_map_r[emission_2_rand_index].split('_')[1][0] == 'E':
+            syllable_num_2 = syllable_num_2 + int(obs_map_r[emission_2_rand_index].split('_')[1][1])
+        else:
+            syllable_num_2 = syllable_num_2 + int(obs_map_r[emission_2_rand_index].split('_')[1][0])
+    
+    emissions_1.reverse()
+    emissions_2.reverse()
+    sentence_1 = [obs_map_r[i] for i in emissions_1]
+    sentence_2 = [obs_map_r[i] for i in emissions_2]
+    if print_syllable == False:
+        sentence_1 = []
+        sentence_2 = []
+        sentence_1 = [obs_map_r[i].split('_')[0] for i in emissions_1]
+        sentence_2 = [obs_map_r[i].split('_')[0] for i in emissions_2]
+    
+    return ' '.join(sentence_1).capitalize(), ' '.join(sentence_2).capitalize()
+
 
 def sample_sentence_rythme(hmm, obs_map, rthyme_pair_lib, print_syllable = False, n_syllable = 10):
 
