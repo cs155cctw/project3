@@ -1,0 +1,308 @@
+_________________________________________________________________
+Layer (type)                 Output Shape              Param #   
+=================================================================
+lstm_3 (LSTM)                (None, 150)               111600    
+_________________________________________________________________
+lambda_3 (Lambda)            (None, 150)               0         
+_________________________________________________________________
+dense_3 (Dense)              (None, 35)                5285      
+=================================================================
+Total params: 116,885
+Trainable params: 116,885
+Non-trainable params: 0
+_________________________________________________________________
+Epoch 1/100
+31183/31183 [==============================] - 77s 2ms/step - loss: 2.6559 - categorical_accuracy: 0.2560
+Epoch 2/100
+31183/31183 [==============================] - 74s 2ms/step - loss: 2.2598 - categorical_accuracy: 0.3451
+Epoch 3/100
+31183/31183 [==============================] - 92s 3ms/step - loss: 2.1336 - categorical_accuracy: 0.3732
+Epoch 4/100
+31183/31183 [==============================] - 91s 3ms/step - loss: 2.0504 - categorical_accuracy: 0.3917
+Epoch 5/100
+31183/31183 [==============================] - 83s 3ms/step - loss: 1.9868 - categorical_accuracy: 0.4075
+Epoch 6/100
+31183/31183 [==============================] - 82s 3ms/step - loss: 1.9362 - categorical_accuracy: 0.4207
+Epoch 7/100
+31183/31183 [==============================] - 86s 3ms/step - loss: 1.8926 - categorical_accuracy: 0.4326
+Epoch 8/100
+31183/31183 [==============================] - 97s 3ms/step - loss: 1.8531 - categorical_accuracy: 0.4415
+Epoch 9/100
+31183/31183 [==============================] - 86s 3ms/step - loss: 1.8175 - categorical_accuracy: 0.4501
+Epoch 10/100
+31183/31183 [==============================] - 84s 3ms/step - loss: 1.7851 - categorical_accuracy: 0.4609
+Epoch 11/100
+31183/31183 [==============================] - 84s 3ms/step - loss: 1.7558 - categorical_accuracy: 0.4670
+Epoch 12/100
+31183/31183 [==============================] - 83s 3ms/step - loss: 1.7273 - categorical_accuracy: 0.4755
+Epoch 13/100
+31183/31183 [==============================] - 86s 3ms/step - loss: 1.7007 - categorical_accuracy: 0.4832
+Epoch 14/100
+31183/31183 [==============================] - 90s 3ms/step - loss: 1.6829 - categorical_accuracy: 0.4856
+Epoch 15/100
+31183/31183 [==============================] - 99s 3ms/step - loss: 1.6573 - categorical_accuracy: 0.4921
+Epoch 16/100
+31183/31183 [==============================] - 69s 2ms/step - loss: 1.6331 - categorical_accuracy: 0.4973
+Epoch 17/100
+31183/31183 [==============================] - 65s 2ms/step - loss: 1.6120 - categorical_accuracy: 0.5049
+Epoch 18/100
+31183/31183 [==============================] - 66s 2ms/step - loss: 1.5890 - categorical_accuracy: 0.5092
+Epoch 19/100
+31183/31183 [==============================] - 62s 2ms/step - loss: 1.5672 - categorical_accuracy: 0.5158
+Epoch 20/100
+31183/31183 [==============================] - 72s 2ms/step - loss: 1.5456 - categorical_accuracy: 0.5218
+Epoch 21/100
+31183/31183 [==============================] - 64s 2ms/step - loss: 1.5229 - categorical_accuracy: 0.5265
+Epoch 22/100
+31183/31183 [==============================] - 66s 2ms/step - loss: 1.5017 - categorical_accuracy: 0.5348
+Epoch 23/100
+31183/31183 [==============================] - 61s 2ms/step - loss: 1.4786 - categorical_accuracy: 0.5405
+Epoch 24/100
+31183/31183 [==============================] - 61s 2ms/step - loss: 1.4565 - categorical_accuracy: 0.5479
+Epoch 25/100
+31183/31183 [==============================] - 78s 2ms/step - loss: 1.4352 - categorical_accuracy: 0.5531
+Epoch 26/100
+31183/31183 [==============================] - 66s 2ms/step - loss: 1.4124 - categorical_accuracy: 0.5601
+Epoch 27/100
+31183/31183 [==============================] - 76s 2ms/step - loss: 1.3891 - categorical_accuracy: 0.5652
+Epoch 28/100
+31183/31183 [==============================] - 70s 2ms/step - loss: 1.3669 - categorical_accuracy: 0.5733
+Epoch 29/100
+31183/31183 [==============================] - 69s 2ms/step - loss: 1.3425 - categorical_accuracy: 0.5805
+Epoch 30/100
+31183/31183 [==============================] - 88s 3ms/step - loss: 1.3202 - categorical_accuracy: 0.5894
+Epoch 31/100
+31183/31183 [==============================] - 68s 2ms/step - loss: 1.2971 - categorical_accuracy: 0.5939
+Epoch 32/100
+31183/31183 [==============================] - 87s 3ms/step - loss: 1.2761 - categorical_accuracy: 0.6006
+Epoch 33/100
+31183/31183 [==============================] - 66s 2ms/step - loss: 1.2525 - categorical_accuracy: 0.6080
+Epoch 34/100
+31183/31183 [==============================] - 76s 2ms/step - loss: 1.2299 - categorical_accuracy: 0.6149
+Epoch 35/100
+31183/31183 [==============================] - 78s 3ms/step - loss: 1.2085 - categorical_accuracy: 0.6223
+Epoch 36/100
+31183/31183 [==============================] - 69s 2ms/step - loss: 1.1877 - categorical_accuracy: 0.6289
+Epoch 37/100
+31183/31183 [==============================] - 82s 3ms/step - loss: 1.1649 - categorical_accuracy: 0.6366
+Epoch 38/100
+31183/31183 [==============================] - 69s 2ms/step - loss: 1.1426 - categorical_accuracy: 0.6448
+Epoch 39/100
+31183/31183 [==============================] - 88s 3ms/step - loss: 1.1225 - categorical_accuracy: 0.6475
+Epoch 40/100
+31183/31183 [==============================] - 74s 2ms/step - loss: 1.1006 - categorical_accuracy: 0.6561
+Epoch 41/100
+31183/31183 [==============================] - 82s 3ms/step - loss: 1.0799 - categorical_accuracy: 0.6643
+Epoch 42/100
+31183/31183 [==============================] - 70s 2ms/step - loss: 1.0599 - categorical_accuracy: 0.6696
+Epoch 43/100
+31183/31183 [==============================] - 80s 3ms/step - loss: 1.0421 - categorical_accuracy: 0.6746
+Epoch 44/100
+31183/31183 [==============================] - 73s 2ms/step - loss: 1.0237 - categorical_accuracy: 0.6815
+Epoch 45/100
+31183/31183 [==============================] - 68s 2ms/step - loss: 1.0030 - categorical_accuracy: 0.6885
+Epoch 46/100
+31183/31183 [==============================] - 74s 2ms/step - loss: 0.9844 - categorical_accuracy: 0.6947
+Epoch 47/100
+31183/31183 [==============================] - 64s 2ms/step - loss: 0.9666 - categorical_accuracy: 0.7006
+Epoch 48/100
+31183/31183 [==============================] - 63s 2ms/step - loss: 0.9520 - categorical_accuracy: 0.7041
+Epoch 49/100
+31183/31183 [==============================] - 63s 2ms/step - loss: 0.9397 - categorical_accuracy: 0.7096
+Epoch 50/100
+31183/31183 [==============================] - 63s 2ms/step - loss: 0.9203 - categorical_accuracy: 0.7163
+Epoch 51/100
+31183/31183 [==============================] - 64s 2ms/step - loss: 0.9061 - categorical_accuracy: 0.7177
+Epoch 52/100
+31183/31183 [==============================] - 63s 2ms/step - loss: 0.8915 - categorical_accuracy: 0.7231
+Epoch 53/100
+31183/31183 [==============================] - 65s 2ms/step - loss: 0.8799 - categorical_accuracy: 0.7269
+Epoch 54/100
+31183/31183 [==============================] - 66s 2ms/step - loss: 0.8647 - categorical_accuracy: 0.7315
+Epoch 55/100
+31183/31183 [==============================] - 65s 2ms/step - loss: 0.8562 - categorical_accuracy: 0.7350
+Epoch 56/100
+31183/31183 [==============================] - 65s 2ms/step - loss: 0.8417 - categorical_accuracy: 0.7411
+Epoch 57/100
+31183/31183 [==============================] - 65s 2ms/step - loss: 0.8291 - categorical_accuracy: 0.7454
+Epoch 58/100
+31183/31183 [==============================] - 65s 2ms/step - loss: 0.8159 - categorical_accuracy: 0.7481
+Epoch 59/100
+31183/31183 [==============================] - 64s 2ms/step - loss: 0.8074 - categorical_accuracy: 0.7504
+Epoch 60/100
+31183/31183 [==============================] - 64s 2ms/step - loss: 0.7963 - categorical_accuracy: 0.7544
+Epoch 61/100
+31183/31183 [==============================] - 65s 2ms/step - loss: 0.7815 - categorical_accuracy: 0.7598
+Epoch 62/100
+31183/31183 [==============================] - 65s 2ms/step - loss: 0.7701 - categorical_accuracy: 0.7609
+Epoch 63/100
+31183/31183 [==============================] - 65s 2ms/step - loss: 0.7673 - categorical_accuracy: 0.7625
+Epoch 64/100
+31183/31183 [==============================] - 63s 2ms/step - loss: 0.7619 - categorical_accuracy: 0.7636
+Epoch 65/100
+31183/31183 [==============================] - 68s 2ms/step - loss: 0.7477 - categorical_accuracy: 0.7692
+Epoch 66/100
+31183/31183 [==============================] - 66s 2ms/step - loss: 0.7391 - categorical_accuracy: 0.7737
+Epoch 67/100
+31183/31183 [==============================] - 64s 2ms/step - loss: 0.7260 - categorical_accuracy: 0.7766
+Epoch 68/100
+31183/31183 [==============================] - 68s 2ms/step - loss: 0.7232 - categorical_accuracy: 0.7757
+Epoch 69/100
+31183/31183 [==============================] - 67s 2ms/step - loss: 0.7103 - categorical_accuracy: 0.7799
+Epoch 70/100
+31183/31183 [==============================] - 66s 2ms/step - loss: 0.7097 - categorical_accuracy: 0.7767
+Epoch 71/100
+31183/31183 [==============================] - 64s 2ms/step - loss: 0.6958 - categorical_accuracy: 0.7854
+Epoch 72/100
+31183/31183 [==============================] - 70s 2ms/step - loss: 0.6862 - categorical_accuracy: 0.7857
+Epoch 73/100
+31183/31183 [==============================] - 66s 2ms/step - loss: 0.6828 - categorical_accuracy: 0.7881
+Epoch 74/100
+31183/31183 [==============================] - 68s 2ms/step - loss: 0.6776 - categorical_accuracy: 0.7883
+Epoch 75/100
+31183/31183 [==============================] - 66s 2ms/step - loss: 0.6765 - categorical_accuracy: 0.7869
+Epoch 76/100
+31183/31183 [==============================] - 71s 2ms/step - loss: 0.6571 - categorical_accuracy: 0.7984
+Epoch 77/100
+31183/31183 [==============================] - 64s 2ms/step - loss: 0.6583 - categorical_accuracy: 0.7934
+Epoch 78/100
+31183/31183 [==============================] - 65s 2ms/step - loss: 0.6477 - categorical_accuracy: 0.8002
+Epoch 79/100
+31183/31183 [==============================] - 68s 2ms/step - loss: 0.6503 - categorical_accuracy: 0.7992
+Epoch 80/100
+31183/31183 [==============================] - 65s 2ms/step - loss: 0.6391 - categorical_accuracy: 0.8021
+Epoch 81/100
+31183/31183 [==============================] - 74s 2ms/step - loss: 0.6290 - categorical_accuracy: 0.8033
+Epoch 82/100
+31183/31183 [==============================] - 68s 2ms/step - loss: 0.6332 - categorical_accuracy: 0.8003
+Epoch 83/100
+31183/31183 [==============================] - 67s 2ms/step - loss: 0.6232 - categorical_accuracy: 0.8047
+Epoch 84/100
+31183/31183 [==============================] - 70s 2ms/step - loss: 0.6175 - categorical_accuracy: 0.8067
+Epoch 85/100
+31183/31183 [==============================] - 68s 2ms/step - loss: 0.6124 - categorical_accuracy: 0.8094
+Epoch 86/100
+31183/31183 [==============================] - 69s 2ms/step - loss: 0.6083 - categorical_accuracy: 0.8104
+Epoch 87/100
+31183/31183 [==============================] - 74s 2ms/step - loss: 0.6019 - categorical_accuracy: 0.8118
+Epoch 88/100
+31183/31183 [==============================] - 73s 2ms/step - loss: 0.5923 - categorical_accuracy: 0.8165
+Epoch 89/100
+31183/31183 [==============================] - 73s 2ms/step - loss: 0.6048 - categorical_accuracy: 0.8095
+Epoch 90/100
+31183/31183 [==============================] - 121s 4ms/step - loss: 0.5966 - categorical_accuracy: 0.8130
+Epoch 91/100
+31183/31183 [==============================] - 97s 3ms/step - loss: 0.5819 - categorical_accuracy: 0.8168
+Epoch 92/100
+31183/31183 [==============================] - 96s 3ms/step - loss: 0.5809 - categorical_accuracy: 0.8187
+Epoch 93/100
+31183/31183 [==============================] - 92s 3ms/step - loss: 0.5753 - categorical_accuracy: 0.8193
+Epoch 94/100
+31183/31183 [==============================] - 87s 3ms/step - loss: 0.5686 - categorical_accuracy: 0.8202
+Epoch 95/100
+31183/31183 [==============================] - 94s 3ms/step - loss: 0.5601 - categorical_accuracy: 0.8242
+Epoch 96/100
+31183/31183 [==============================] - 89s 3ms/step - loss: 0.5616 - categorical_accuracy: 0.8251
+Epoch 97/100
+31183/31183 [==============================] - 82s 3ms/step - loss: 0.5604 - categorical_accuracy: 0.8245
+Epoch 98/100
+31183/31183 [==============================] - 84s 3ms/step - loss: 0.5523 - categorical_accuracy: 0.8289
+Epoch 99/100
+31183/31183 [==============================] - 78s 2ms/step - loss: 0.5351 - categorical_accuracy: 0.8353
+Epoch 100/100
+31183/31183 [==============================] - 67s 2ms/step - loss: 0.5560 - categorical_accuracy: 0.8238
+predict_tmp = 0.25
+no destre be other partance and sland th 
+ ou art ablet to be, or wilted to happy t 
+ o boud-spive. that i was y'e canst is ba 
+ rt his self recentest to the werited tha 
+ t thy self my deartht that glear how she 
+  clowld, and his suchers more be spind,  
+ that in my strange that kentless shility 
+ , bleavenees to beak thee gartate thise  
+ twrot lea till in the encery thise to co 
+ ure thy self thy graised that have pate  
+ my love, that in you will im the war not 
+  knide, looks, and the reme to show hear 
+ s when they spend, for they briglt to on 
+ e dracks that in my strange, and they mi 
+ 
+predict_tmp = 0.5
+bounhing wastes that straty my heartied  
+ may, betien that thou alt baind bowtor,  
+ in my love be from me for self acceasuon 
+  your and still i so pransom beant even  
+ but sund why forr thee, and hath tear he 
+ aven thee black that is a caunt the fere 
+ mter's somp any prino, but that black nu 
+ t sifve is the windons of thy beauty gre 
+ et in, and eyes his siden that steal the 
+ e badh o'ery. but subme, and loss to be  
+ dear, in recest, when thou dost heaver t 
+ hey my bedofd subject, whereit in the lo 
+ ve, not, and this gavern loving. his sel 
+ f look upon thy recent, whereflest, my s 
+ 
+predict_tmp = 0.75
+the dusch seast suine. for flow wheret t 
+ his sears, uress. then i hath stall me,  
+ or you ge ampeeft, my self awsenceous be 
+ ar whereit thou from men love-some, that 
+  i ammer thou face the which thee hang o 
+ f the sport doth the content, and rid de 
+ ceals any bleat of this i hatter things  
+ all han live thou untinn gefelest time,  
+ nor prine, whine eyes, thy self this sha 
+ ll asset, then te love, not wend istey t 
+ hat weals mine in leaded orreves than he 
+ round of thee. wered with paintancy of b 
+ ear, and my wrot, whom my thoughts still 
+  me undard ablivind. in no hor these ant 
+ 
+predict_tmp = 1.0
+for thee. lemenes, there oro stard got,  
+ if the exting appearth: love you love's  
+ livern of the ext ploud i ly bleat of yo 
+ u dely so ell-ect, then gentsing my for  
+ that which doth the day be deceavenly ha 
+ th pati'ge that know wherevandon of thos 
+ e have eath far arce. thy beauty wrinked 
+  moon and mine in the endon' now farter  
+ than beloor drang hear do beautyous oud  
+ will may shalts ow whe worthifll, is ind 
+ ight be fimbst me, and math, which a beh 
+ id from advir. of not borh heart that di 
+ d, turner' that i sold, in this virgeres 
+  on thee. if the facking the frawst con  
+ 
+predict_tmp = 1.25
+no croft hid stry padt's cleam she onemp 
+ ring thy day, and your smaken all to the 
+  tive ectyow, then breakun, resing trats 
+ tance in poying my long, thy self thy sh 
+ ould build, ard you? that mine you queit 
+ uou quitter, whinctec' and mine his crea 
+ t, chind, far yey peiding time, the woul 
+ d end. for find, if look be age resented 
+  thast ond: thy self thou kidgerst doy o 
+ f i by crizidest to-fell; cuspy and you  
+ were and ifteb louge, han is his id my l 
+ ove, that my revesty or thou be they the 
+ e mistw, thou carst my lotcy, agained th 
+ at heavinst fair awmettains if stwett wi 
+ 
+predict_tmp = 1.5
+why bust night. if things woost suive. n 
+ or they growns immect'n than the praise  
+ time, do cooded sitult mose gambut knew  
+ nor sum jed main, thou cheinst, for the  
+ when, is fol fiddid. the fised? nor sost 
+  in thises my love, which barst bart ris 
+ crien loft, thy self this trind if wor.  
+ morimem would bbutht, acc unlyost timetl 
+ y has yet still's i crusutow, tink'e dra 
+ ckes bling twing clald in fold, or beant 
+ . iven be unticl: sue, but. loving, than 
+  unlendonsed on quege, every compabed th 
+ ain, my sordititu ther, ance forthen in  
+ be glazs inds thepeac, ching? thous stor 
