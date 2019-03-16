@@ -23,7 +23,7 @@ x, y = RNN_data_generator(corpus, seq_size, batch_size, dict_len, skip_step)
 hidden_size = 150
 
 # modify the temperature to obtain different probabiliy distribution
-temp_list = [0.75] #[0.25, 0.75, 1.5]
+temp_list = [0.25, 0.75, 1.5]
 for temp in temp_list:
     # Model created with constraints in the problem
     model = Sequential()
